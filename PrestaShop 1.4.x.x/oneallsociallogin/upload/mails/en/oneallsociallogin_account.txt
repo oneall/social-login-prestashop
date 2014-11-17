@@ -1,0 +1,23 @@
+Hi {firstname} {lastname},
+
+Thank you for creating a customer account at {shop_name}.
+
+You can login on our shop by using your social network account:
+
+Account:  {identity_provider}
+
+Alternatively you can also use this login details:
+
+E-mail address: {email}
+Password: {passwd}
+
+You can now place orders on our shop: {shop_url}
+
+Important Security Tips:
+
+1. Always keep your account details safe.
+2. Never disclose your login details to anyone.
+3. Change your password regularly.
+4. Should you suspect someone is using your account illegally, please notify us immediately.
+
+{shop_url} powered by PrestaShop™

@@ -1,0 +1,43 @@
+#oneallsociallogin p {
+  padding-bottom: 10px;
+}
+
+#oneallsociallogin .std fieldset {
+  margin-top: 0;
+  padding: 10px;
+  border-radius: 3px;
+  background-color: #eee;
+}
+
+#oneallsociallogin .std fieldset p.required {
+  color: #333
+}
+
+#oneallsociallogin .std fieldset p.text label {
+  display: inline-block;
+  padding-right: 10px;
+  width: 174px;
+  font-weight: bold;
+  font-size: 12px;
+  text-align: right;
+}
+
+#oneallsociallogin .std fieldset sup {
+  color: #990000;
+}
+
+#oneallsociallogin .std fieldset p.text input {
+  padding: 0 5px;
+  height: 20px;
+  width: 253px; /* 263 */
+  border: 1px solid #ccc;
+  background: url(../img/bg_input.png) repeat-x 0 0 #fff;
+}
+
+#oneallsociallogin .std fieldset p.submit {
+  padding: 10px 0 20px 187px
+}
+
+#oneallsociallogin .std fieldset p.submit .button {
+  padding: 5px 25px
+}

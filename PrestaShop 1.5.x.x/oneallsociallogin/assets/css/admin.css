@@ -1,0 +1,196 @@
+/* ********************* Boxes */
+.oasl_box {
+  border: 1px solid #E6DB55;
+  margin-bottom: 10px;
+  padding: 10px 15px;
+  background-color: #FFFFE0;
+}
+
+.oasl_box .button {
+  display: inline-block;
+  margin: 5px 0;
+}
+
+.oasl_box_title {
+  border-bottom: 1px solid #E6DB55;
+  font-weight: bold;
+  padding-bottom: 6px;
+  margin-bottom: 6px;
+}
+
+/* ********************* Messages */
+.oasl_message {
+  font-size: 1.1em;
+}
+
+.oasl_error_message {
+  color: red;
+  background: url("../img/status_error.png") no-repeat scroll 0 50% transparent;
+  padding-left: 25px;
+  font-weight: bold;
+}
+
+.oasl_error_message,.oasl_error_message a {
+  color: red;
+  font-weight: bold;
+}
+
+.oasl_error_message a {
+  text-decoration: underline !important;
+}
+
+.oasl_working_message {
+  color: blue;
+  background: url("../img/status_loading.gif") no-repeat scroll 0 50% transparent;
+  padding-left: 25px;
+  font-weight: bold;
+}
+
+.oasl_error_message a:hover {
+  color: #C70000;
+  text-decoration: none !important;
+}
+
+.oasl_success_message {
+  color: green;
+  background: url("../img/status_ok.png") no-repeat scroll 0 50% transparent;
+  padding-left: 25px;
+  font-weight: bold;
+}
+
+/* ********************* Notices */
+.oasl_notice {
+  padding: 0 0 20px;
+}
+
+.oasl_notice a {
+  color: blue;
+  font-weight: bold;
+  text-decoration: underline !important;
+}
+
+.oasl_notice a:hover {
+  text-decoration: none !important;
+}
+
+/* ********************* Providers */
+.oasl_provider_row label {
+  height: 35px;
+  line-height: 35px;
+}
+
+.oasl_provider_block {
+  height: 35px;
+  line-height: 35px;
+}
+
+.oasl_provider_block input {
+  margin-top: 10px;
+}
+
+.oasl_provider {
+  background-image: url("../img/provider_sprite_35_35.png");
+  text-indent: -9999px;
+  height: 35px;
+  width: 35px;
+  display: inline-block;
+  float: left;
+  margin: 0 5px;
+  cursor: pointer;
+}
+
+.oasl_provider_aol {
+  background-position: -2px -1px;
+}
+
+.oasl_provider_blogger {
+  background-position: -39px -1px;
+}
+
+.oasl_provider_facebook {
+  background-position: -76px -1px;
+}
+
+.oasl_provider_foursquare {
+  background-position: -113px -1px;
+}
+
+.oasl_provider_google {
+  background-position: -150px -1px;
+}
+
+.oasl_provider_hyves {
+  background-position: -187px -1px;
+}
+
+.oasl_provider_linkedin {
+  background-position: -224px -1px;
+}
+
+.oasl_provider_windowslive {
+  background-position: -261px -1px;
+}
+
+.oasl_provider_livejournal {
+  background-position: -298px -1px;
+}
+
+.oasl_provider_myspace {
+  background-position: -372px -1px;
+}
+
+.oasl_provider_openid {
+  background-position: -409px -1px;
+}
+
+.oasl_provider_twitter {
+  background-position: -520px -1px;
+}
+
+.oasl_provider_vkontakte {
+  background-position: -631px -1px;
+}
+
+.oasl_provider_wordpress {
+  background-position: -668px -1px;
+}
+
+.oasl_provider_yahoo {
+  background-position: -705px -1px;
+}
+
+.oasl_provider_paypal {
+  background-position: -742px -1px;
+}
+
+.oasl_provider_stackexchange {
+  background-position: -779px -1px;
+}
+
+.oasl_provider_steam {
+  background-position: -816px -1px;
+}
+
+.oasl_provider_mailru {
+  background-position: -853px -1px;
+}
+
+.oasl_provider_skyrock {
+  background-position: -890px -1px;
+}
+
+.oasl_provider_github {
+  background-position: -927px -1px;
+}
+
+.oasl_provider_disqus {
+  background-position: -964px -1px;
+}
+
+.oasl_provider_youtube {
+  background-position: -1001px -1px;
+}
+
+.oasl_provider_odnoklassniki {
+  background-position: -1038px -1px;
+}

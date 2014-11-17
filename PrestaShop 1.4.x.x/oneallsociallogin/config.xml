@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+	<name>oneallsociallogin</name>
+	<displayName><![CDATA[OneAll Social Login]]></displayName>
+	<version><![CDATA[1.1]]></version>
+	<description><![CDATA[Allows your users to register and login to your PrestaShop with their existing social network account (Twitter, Facebook, LinkedIn, Google ...)]]></description>
+	<author><![CDATA[OneAll LLC]]></author>
+	<tab><![CDATA[administration]]></tab>
+	<confirmUninstall><![CDATA[Are you sure you want to uninstall Social Login?]]></confirmUninstall>	
+	<is_configurable>1</is_configurable>
+	<need_instance>1</need_instance>
+	<limited_countries></limited_countries>
+</module>
