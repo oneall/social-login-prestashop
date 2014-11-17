@@ -1,4 +1,4 @@
-social-login-prestashop
+Social Login for Prestashop
 ====================
 
-Social Login for Prestshop
+http://docs.oneall.com/plugins/guide/social-login-prestashop/
