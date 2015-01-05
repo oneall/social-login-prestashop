@@ -22,57 +22,59 @@
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
  */
-include_once('../../../../config/config.inc.php');
-include_once('../../../../init.php');
-include_once('../../../../modules/oneallsociallogin/includes/tools.php');
+include_once ('../../../../config/config.inc.php');
+include_once ('../../../../init.php');
+include_once ('../../../../modules/oneallsociallogin/includes/tools.php');
 
+// Otherwise it will not work in various browsers.
+header ('Access-Control-Allow-Origin: *');
 
 // Security Check.
-if (Tools::getValue ('oasl_action') <> '' AND (Tools::getValue ('oasl_token') == sha1 (_COOKIE_KEY_ . 'ONEALLSOCIALLOGIN')))
+if (Tools::getValue ('oasl_action') != '' and (Tools::getValue ('oasl_token') == sha1 (_COOKIE_KEY_ . 'ONEALLSOCIALLOGIN')))
 {
 	switch (Tools::getValue ('oasl_action'))
 	{
 		// ****** AUTODETECT CONNECTION HANDLER
 		case 'autodetect_api_connection_handler':
-		//Check CURL HTTPS - Port 443
+			// Check CURL HTTPS - Port 443
 			if (oneall_social_login_tools::check_curl (true) === true)
 			{
 				die ('success_autodetect_api_curl_https');
 			}
-			//Check CURL HTTP - Port 80
+			// Check CURL HTTP - Port 80
 			elseif (oneall_social_login_tools::check_curl (false) === true)
 			{
 				die ('success_autodetect_api_curl_http');
 			}
-			//Check FSOCKOPEN HTTPS - Port 443
+			// Check FSOCKOPEN HTTPS - Port 443
 			elseif (oneall_social_login_tools::check_fsockopen (true) == true)
 			{
 				die ('success_autodetect_api_fsockopen_https');
 			}
-			//Check FSOCKOPEN HTTP - Port 80
+			// Check FSOCKOPEN HTTP - Port 80
 			elseif (oneall_social_login_tools::check_fsockopen (false) == true)
 			{
 				die ('success_autodetect_api_fsockopen_http');
 			}
 
-			//No working handler found
+			// No working handler found
 			die ('error_autodetect_api_no_handler');
 			break;
 
 		// ****** CHECK CONNECTION SETTINGS
 		case 'check_api_settings':
-			//API Credentials
+			// API Credentials
 			$api_subdomain = trim (Tools::getValue ('oasl_api_subdomain'));
 			$api_key = trim (Tools::getValue ('oasl_api_key'));
 			$api_secret = trim (Tools::getValue ('oasl_api_secret'));
 
-			//Full domain entered
+			// Full domain entered
 			if (preg_match ("/([a-z0-9\-]+)\.api\.oneall\.com/i", $api_subdomain, $matches))
 			{
 				$api_subdomain = $matches [1];
 			}
 
-			//API Settings
+			// API Settings
 			$api_connection_port = trim (Tools::getValue ('oasl_api_connection_port'));
 			$api_connection_port = ($api_connection_port == 80 ? 80 : 443);
 			$api_connection_use_https = ($api_connection_port == 443);
@@ -80,68 +82,68 @@ if (Tools::getValue ('oasl_action') <> '' AND (Tools::getValue ('oasl_token') ==
 			$api_connection_handler = trim (Tools::getValue ('oasl_api_connection_handler'));
 			$api_connection_handler = ($api_connection_handler == 'fsockopen' ? 'fsockopen' : 'curl');
 
-			//Check if all fields have been filled out
-			if (empty ($api_subdomain) OR empty ($api_key) OR empty ($api_secret))
+			// Check if all fields have been filled out
+			if (empty ($api_subdomain) or empty ($api_key) or empty ($api_secret))
 			{
 				die ('error_not_all_fields_filled_out');
 			}
 
-			//Check FSOCKOPEN
+			// Check FSOCKOPEN
 			if ($api_connection_handler == 'fsockopen')
 			{
-				if (!oneall_social_login_tools::check_fsockopen ($api_connection_use_https))
+				if (! oneall_social_login_tools::check_fsockopen ($api_connection_use_https))
 				{
 					die ('error_selected_handler_faulty');
 				}
 			}
-			//Check CURL
+			// Check CURL
 			else
 			{
-				if (!oneall_social_login_tools::check_curl ($api_connection_use_https))
+				if (! oneall_social_login_tools::check_curl ($api_connection_use_https))
 				{
 					die ('error_selected_handler_faulty');
 				}
 			}
 
-			//Check subdomain format
-			if (!preg_match ("/^[a-z0-9\-]+$/i", $api_subdomain))
+			// Check subdomain format
+			if (! preg_match ("/^[a-z0-9\-]+$/i", $api_subdomain))
 			{
 				die ('error_subdomain_wrong_syntax');
 			}
 
-			//Domain
+			// Domain
 			$api_domain = $api_subdomain . '.api.oneall.com';
 
-			//Connection to
+			// Connection to
 			$api_resource_url = ($api_connection_use_https ? 'https' : 'http') . '://' . $api_domain . '/tools/ping.json';
 
-			//Get connection details
-			$result = oneall_social_login_tools::do_api_request ($api_connection_handler, $api_resource_url, array ('api_key' => $api_key, 'api_secret' => $api_secret), 15);
+			// Get connection details
+			$result = oneall_social_login_tools::do_api_request ($api_connection_handler, $api_resource_url, array ('api_key' => $api_key,'api_secret' => $api_secret ), 15);
 
-			//Parse result
-			if (is_object ($result) AND property_exists ($result, 'http_code') AND property_exists ($result, 'http_data'))
+			// Parse result
+			if (is_object ($result) and property_exists ($result, 'http_code') and property_exists ($result, 'http_data'))
 			{
 				switch ($result->http_code)
 				{
-					//Success
+					// Success
 					case 200:
 						die ('success');
-					break;
+						break;
 
-					//Authentication Error
+					// Authentication Error
 					case 401:
 						die ('error_authentication_credentials_wrong');
-					break;
+						break;
 
-					//Wrong Subdomain
+					// Wrong Subdomain
 					case 404:
 						die ('error_subdomain_wrong');
-					break;
+						break;
 
-					//Other error
+					// Other error
 					default:
 						die ('error_communication');
-					break;
+						break;
 				}
 			}
 			else
