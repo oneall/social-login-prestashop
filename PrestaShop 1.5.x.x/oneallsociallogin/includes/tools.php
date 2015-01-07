@@ -1,7 +1,8 @@
 <?php
+
 /**
  * @package   	OneAll Social Login
- * @copyright 	Copyright 2014 http://www.oneall.com - All rights reserved.
+ * @copyright 	Copyright 2011-2015 http://www.oneall.com - All rights reserved
  * @license   	GNU/GPL 2 or later
  *
  * This program is free software; you can redistribute it and/or
@@ -23,12 +24,12 @@
  *
  */
 
-//OneAll Social Login Toolbox
+// Toolbox.
 class oneall_social_login_tools
 {
 	/**
-	* Logs a given customer in.
-	*/
+	 * Logs a given customer in.
+	 */
 	public static function login_customer ($id_customer)
 	{
 		// Make sure that that the customers exists.
@@ -36,60 +37,60 @@ class oneall_social_login_tools
 		$result = Db::getInstance ()->GetRow ($sql);
 
 		// The user account has been found!
-		if (!empty ($result ['id_customer']))
+		if (! empty ($result ['id_customer']))
 		{
 			// See => CustomerCore::getByEmail
-			$customer = new Customer();
+			$customer = new Customer ();
 			$customer->id = $result ['id_customer'];
 			foreach ($result as $key => $value)
 			{
-				if (key_exists($key, $customer))
+				if (key_exists ($key, $customer))
 				{
 					$customer->{$key} = $value;
 				}
 			}
 
 			// See => AuthControllerCore::processSubmitLogin
-			Hook::exec('actionBeforeAuthentication');
+			Hook::exec ('actionBeforeAuthentication');
 
 			$context = Context::getContext ();
-			$context->cookie->id_compare = isset($context->cookie->id_compare) ? $context->cookie->id_compare: CompareProduct::getIdCompareByIdCustomer($customer->id);
- 			$context->cookie->id_customer = (int)($customer->id);
+			$context->cookie->id_compare = isset ($context->cookie->id_compare) ? $context->cookie->id_compare : CompareProduct::getIdCompareByIdCustomer ($customer->id);
+			$context->cookie->id_customer = (int) ($customer->id);
 			$context->cookie->customer_lastname = $customer->lastname;
 			$context->cookie->customer_firstname = $customer->firstname;
 			$context->cookie->logged = 1;
 			$customer->logged = 1;
-			$context->cookie->is_guest = $customer->isGuest();
+			$context->cookie->is_guest = $customer->isGuest ();
 			$context->cookie->passwd = $customer->passwd;
 			$context->cookie->email = $customer->email;
 
 			// Add customer to the context
 			$context->customer = $customer;
 
-			if (Configuration::get('PS_CART_FOLLOWING') && (empty($context->cookie->id_cart) || Cart::getNbProducts($context->cookie->id_cart) == 0) && $id_cart = (int)Cart::lastNoneOrderedCart($context->customer->id))
+			if (Configuration::get ('PS_CART_FOLLOWING') && (empty ($context->cookie->id_cart) || Cart::getNbProducts ($context->cookie->id_cart) == 0) && $id_cart = (int) Cart::lastNoneOrderedCart ($context->customer->id))
 			{
-				$context->cart = new Cart($id_cart);
+				$context->cart = new Cart ($id_cart);
 			}
 			else
 			{
 				$context->cart->id_carrier = 0;
-				$context->cart->setDeliveryOption(null);
-				$context->cart->id_address_delivery = Address::getFirstCustomerAddressId((int)($customer->id));
-				$context->cart->id_address_invoice = Address::getFirstCustomerAddressId((int)($customer->id));
+				$context->cart->setDeliveryOption (null);
+				$context->cart->id_address_delivery = Address::getFirstCustomerAddressId ((int) ($customer->id));
+				$context->cart->id_address_invoice = Address::getFirstCustomerAddressId ((int) ($customer->id));
 			}
-			$context->cart->id_customer = (int)$customer->id;
+			$context->cart->id_customer = (int) $customer->id;
 			$context->cart->secure_key = $customer->secure_key;
-			$context->cart->save();
+			$context->cart->save ();
 
-			$context->cookie->id_cart = (int)$context->cart->id;
-			$context->cookie->update();
-			$context->cart->autosetProductAddress();
+			$context->cookie->id_cart = (int) $context->cart->id;
+			$context->cookie->update ();
+			$context->cart->autosetProductAddress ();
 
-			Hook::exec('actionAuthentication');
+			Hook::exec ('actionAuthentication');
 
 			// Login information have changed, so we check if the cart rules still apply
-			CartRule::autoRemoveFromCart($context);
-			CartRule::autoAddToCart($context);
+			CartRule::autoRemoveFromCart ($context);
+			CartRule::autoAddToCart ($context);
 
 			// Customer is now logged in.
 			return true;
@@ -99,18 +100,17 @@ class oneall_social_login_tools
 		return false;
 	}
 
-
 	/**
 	 * Creates a new customer based on the given data.
 	 */
 	public static function create_customer_from_data (Array $data, $send_email_to_admin = false, $send_email_to_customer = false)
 	{
-		if (is_array ($data) && ! empty ($data['user_token']) && ! empty ($data['identity_token']))
+		if (is_array ($data) && ! empty ($data ['user_token']) && ! empty ($data ['identity_token']))
 		{
-			$password = Tools::passwdGen();
+			$password = Tools::passwdGen ();
 
 			// Build customer fields.
-			$customer = new CustomerCore();
+			$customer = new CustomerCore ();
 			$customer->firstname = $data ['user_first_name'];
 			$customer->lastname = $data ['user_last_name'];
 			$customer->id_gender = $data ['user_gender'];
@@ -118,21 +118,21 @@ class oneall_social_login_tools
 			$customer->active = true;
 			$customer->deleted = false;
 			$customer->is_guest = false;
-			$customer->passwd = Tools::encrypt($password);
+			$customer->passwd = Tools::encrypt ($password);
 
 			// We could get the email.
-			if (!empty ($data['user_email']))
+			if (! empty ($data ['user_email']))
 			{
 				// It already exists.
-				if (self::get_id_customer_for_email_address($data ['user_email']) !== false)
+				if (self::get_id_customer_for_email_address ($data ['user_email']) !== false)
 				{
 					// Create a new one.
-					$customer->email = self::generate_random_email_address();
+					$customer->email = self::generate_random_email_address ();
 					$customer->newsletter = false;
 				}
 				else
 				{
-					$customer->email = $data['user_email'];
+					$customer->email = $data ['user_email'];
 					$customer->newsletter = true;
 				}
 			}
@@ -140,7 +140,7 @@ class oneall_social_login_tools
 			else
 			{
 				// Create a new one.
-				$customer->email = self::generate_random_email_address();
+				$customer->email = self::generate_random_email_address ();
 				$customer->newsletter = false;
 			}
 
@@ -148,30 +148,29 @@ class oneall_social_login_tools
 			if ($customer->add ())
 			{
 				// Tie the tokens to the newly created member.
-				if (self::link_tokens_to_id_customer ($customer->id, $data['user_token'], $data['identity_token'], $data['identity_provider']))
+				if (self::link_tokens_to_id_customer ($customer->id, $data ['user_token'], $data ['identity_token'], $data ['identity_provider']))
 				{
-					//Send an email to the customer
+					// Send an email to the customer
 					if ($send_email_to_customer === true)
 					{
-						self::send_confirmation_to_customer ($customer, $password, $data['identity_provider']);
+						self::send_confirmation_to_customer ($customer, $password, $data ['identity_provider']);
 					}
 
-					//Send an email to the administratos
+					// Send an email to the administratos
 					if ($send_email_to_admin === true)
 					{
-						self::send_confirmation_to_administrators ($customer, $data['identity_provider']);
+						self::send_confirmation_to_administrators ($customer, $data ['identity_provider']);
 					}
 
-					//Done
+					// Done
 					return $customer->id;
 				}
 			}
 		}
 
-		//Error
+		// Error
 		return false;
 	}
-
 
 	/**
 	 * Generates a random email address
@@ -196,21 +195,21 @@ class oneall_social_login_tools
 		$row_customer = Db::getInstance ()->GetRow ($sql);
 
 		// The user account has been found!
-		if (!empty ($row_customer ['id_customer']))
+		if (! empty ($row_customer ['id_customer']))
 		{
 			// Read the entry for the given user_token.
 			$sql = "SELECT `id_oasl_user`, `id_customer` FROM `" . _DB_PREFIX_ . "oasl_user` WHERE `user_token` = '" . pSQL ($user_token) . "'";
 			$row_oasl_user = Db::getInstance ()->GetRow ($sql);
 
 			// The user_token exists but is linked to another user.
-			if (!empty ($row_oasl_user ['id_oasl_user']) AND $row_oasl_user ['id_customer'] <> $id_customer)
+			if (! empty ($row_oasl_user ['id_oasl_user']) and $row_oasl_user ['id_customer'] != $id_customer)
 			{
 				// Delete the wrongly linked user_token.
 				$sql = "DELETE FROM `" . _DB_PREFIX_ . "oasl_user` WHERE `user_token` = '" . pSQL ($user_token) . "' LIMIT 1";
 				$result = Db::getInstance ()->execute ($sql);
 
 				// Delete the wrongly linked identity_token.
-				$sql = "DELETE FROM `" . _DB_PREFIX_ . "oasl_identity` WHERE `id_oasl_user` = '" . pSQL ($row_oasl_user ['id_oasl_user']) ."'";
+				$sql = "DELETE FROM `" . _DB_PREFIX_ . "oasl_identity` WHERE `id_oasl_user` = '" . pSQL ($row_oasl_user ['id_oasl_user']) . "'";
 				$result = Db::getInstance ()->execute ($sql);
 
 				// Reset the identifier to create a new one.
@@ -221,7 +220,7 @@ class oneall_social_login_tools
 			if (empty ($row_oasl_user ['id_oasl_user']))
 			{
 				// Add new link.
-				$sql = "INSERT INTO `" . _DB_PREFIX_ . "oasl_user` SET `id_customer` = '" . pSQL ($id_customer) . "', `user_token` = '" . pSQL ($user_token) . "', `date_add`='".date('Y-m-d H:i:s')."'";
+				$sql = "INSERT INTO `" . _DB_PREFIX_ . "oasl_user` SET `id_customer` = '" . pSQL ($id_customer) . "', `user_token` = '" . pSQL ($user_token) . "', `date_add`='" . date ('Y-m-d H:i:s') . "'";
 				$result = Db::getInstance ()->execute ($sql);
 
 				// Identifier of the newly created user_token entry.
@@ -233,7 +232,7 @@ class oneall_social_login_tools
 			$row_oasl_identity = Db::getInstance ()->GetRow ($sql);
 
 			// The identity_token exists but is linked to another user_token.
-			if (!empty ($row_oasl_identity ['id_oasl_identity']) AND $row_oasl_identity ['id_oasl_user'] <> $row_oasl_user ['id_oasl_user'])
+			if (! empty ($row_oasl_identity ['id_oasl_identity']) and $row_oasl_identity ['id_oasl_user'] != $row_oasl_user ['id_oasl_user'])
 			{
 				// Delete the wrongly linked user_token.
 				$sql = "DELETE FROM `" . _DB_PREFIX_ . "oasl_identity` WHERE `id_oasl_identity` = '" . pSQL ($row_oasl_identity ['id_oasl_identity']) . "' LIMIT 1";
@@ -247,7 +246,7 @@ class oneall_social_login_tools
 			if (empty ($row_oasl_identity ['id_oasl_identity']))
 			{
 				// Add new link.
-				$sql = "INSERT INTO `" . _DB_PREFIX_ . "oasl_identity` SET `id_oasl_user` = '" . pSQL ($row_oasl_user ['id_oasl_user']) . "', `identity_token` = '" . pSQL ($identity_token) . "', `identity_provider` = '" . pSQL ($identity_provider) . "', `num_logins`=1, `date_add`='".date('Y-m-d H:i:s')."', `date_upd`='".date('Y-m-d H:i:s')."'";
+				$sql = "INSERT INTO `" . _DB_PREFIX_ . "oasl_identity` SET `id_oasl_user` = '" . pSQL ($row_oasl_user ['id_oasl_user']) . "', `identity_token` = '" . pSQL ($identity_token) . "', `identity_provider` = '" . pSQL ($identity_provider) . "', `num_logins`=1, `date_add`='" . date ('Y-m-d H:i:s') . "', `date_upd`='" . date ('Y-m-d H:i:s') . "'";
 				$result = Db::getInstance ()->execute ($sql);
 
 				// Identifier of the newly created identity_token entry.
@@ -262,7 +261,6 @@ class oneall_social_login_tools
 		return false;
 	}
 
-
 	/**
 	 * Updates the number of logins for an identity_token.
 	 */
@@ -275,14 +273,13 @@ class oneall_social_login_tools
 			return false;
 		}
 
-		//Update
-		$sql = "UPDATE `" . _DB_PREFIX_ . "oasl_identity` SET `num_logins`=`num_logins`+1, `date_upd`='".date('Y-m-d H:i:s')."' WHERE `identity_token`='" . pSQL ($identity_token) . "' LIMIT 1";
+		// Update
+		$sql = "UPDATE `" . _DB_PREFIX_ . "oasl_identity` SET `num_logins`=`num_logins`+1, `date_upd`='" . date ('Y-m-d H:i:s') . "' WHERE `identity_token`='" . pSQL ($identity_token) . "' LIMIT 1";
 		$result = Db::getInstance ()->execute ($sql);
 
-		//Done
+		// Done
 		return $result;
 	}
-
 
 	/**
 	 * Sends a confirmation to the administrators.
@@ -297,26 +294,26 @@ class oneall_social_login_tools
 		$mail_title = "A new customer has registered with Social Login";
 
 		// Setup the mail vars.
-		$mail_vars = array();
-		$mail_vars['{message}']  = "Customer Details:<br />";
-		$mail_vars['{message}'] .= " Identifier: ".	 $customer->id."<br />";
-		$mail_vars['{message}'] .= " First name: ".	 $customer->firstname."<br />";
-		$mail_vars['{message}'] .= " Last name: ".	 $customer->lastname."<br />";
-		$mail_vars['{message}'] .= " Email: ".	 $customer->email."<br />";
-		$mail_vars['{message}'] .= " Signed up with: ".	 $identity_provider."<br />";
+		$mail_vars = array ();
+		$mail_vars ['{message}'] = "Customer Details:<br />";
+		$mail_vars ['{message}'] .= " Identifier: " . $customer->id . "<br />";
+		$mail_vars ['{message}'] .= " First name: " . $customer->firstname . "<br />";
+		$mail_vars ['{message}'] .= " Last name: " . $customer->lastname . "<br />";
+		$mail_vars ['{message}'] .= " Email: " . $customer->email . "<br />";
+		$mail_vars ['{message}'] .= " Signed up with: " . $identity_provider . "<br />";
 
-		//Read employees
+		// Read employees
 		$sql = "SELECT `firstname`, `lastname`, `email` FROM `" . _DB_PREFIX_ . "employee` WHERE `id_profile`=1";
 		$employees = Db::getInstance ()->ExecuteS ($sql);
-		if (is_array ($employees) AND count ($employees) > 0)
+		if (is_array ($employees) and count ($employees) > 0)
 		{
 			foreach ($employees as $employee)
 			{
-				@Mail::Send ($language_id, 'contact', $mail_title ,$mail_vars, $employee['email'], $employee['firstname'].' '.$customer->lastname);
+				@Mail::Send ($language_id, 'contact', $mail_title, $mail_vars, $employee ['email'], $employee ['firstname'] . ' ' . $customer->lastname);
 			}
 		}
 
-		//Done
+		// Done
 		return true;
 	}
 
@@ -330,17 +327,16 @@ class oneall_social_login_tools
 		$language_id = $context->language->id;
 
 		// Setup the mail vars.
-		$mail_vars = array();
-		$mail_vars['{firstname}'] = $customer->firstname;
-		$mail_vars['{lastname}'] = $customer->lastname;
-		$mail_vars['{email}'] = $customer->email;
-		$mail_vars['{passwd}'] = $password;
-		$mail_vars['{identity_provider}'] = $identity_provider;
+		$mail_vars = array ();
+		$mail_vars ['{firstname}'] = $customer->firstname;
+		$mail_vars ['{lastname}'] = $customer->lastname;
+		$mail_vars ['{email}'] = $customer->email;
+		$mail_vars ['{passwd}'] = $password;
+		$mail_vars ['{identity_provider}'] = $identity_provider;
 
 		// Send mail to customer.
-		return @Mail::Send ($language_id, 'oneallsociallogin_account', Mail::l('Welcome!'),$mail_vars, $customer->email, $customer->firstname.' '.$customer->lastname);
+		return @Mail::Send ($language_id, 'oneallsociallogin_account', Mail::l ('Welcome!'), $mail_vars, $customer->email, $customer->firstname . ' ' . $customer->lastname);
 	}
-
 
 	/**
 	 * Returns the customer identifier for a given email address.
@@ -359,9 +355,8 @@ class oneall_social_login_tools
 		$result = Db::getInstance ()->getRow ($sql);
 
 		// Either return the id_customer or false if none has been found.
-		return (!empty ($result ['id_customer']) ? $result ['id_customer'] : false);
+		return (! empty ($result ['id_customer']) ? $result ['id_customer'] : false);
 	}
-
 
 	/**
 	 * Returns the customer identifier for a given token.
@@ -376,38 +371,37 @@ class oneall_social_login_tools
 		}
 
 		// Read the id_customer for this user_token.
-		$sql = "SELECT `id_oasl_user`, `id_customer` FROM `" . _DB_PREFIX_ . "oasl_user` WHERE `user_token` = '" . pSQL($user_token) . "'";
+		$sql = "SELECT `id_oasl_user`, `id_customer` FROM `" . _DB_PREFIX_ . "oasl_user` WHERE `user_token` = '" . pSQL ($user_token) . "'";
 		$row_oasl_user = Db::getInstance ()->GetRow ($sql);
 
 		// We have found an entry for this customers.
-		if (!empty ($row_oasl_user ['id_customer']))
+		if (! empty ($row_oasl_user ['id_customer']))
 		{
 			$id_customer = intval ($row_oasl_user ['id_customer']);
 			$id_oasl_user = intval ($row_oasl_user ['id_oasl_user']);
 
 			// Check if the user account exists.
-			$sql = "SELECT `id_customer` FROM `" . _DB_PREFIX_ . "customer` WHERE `id_customer` = '" . pSQL($id_customer)."'";
+			$sql = "SELECT `id_customer` FROM `" . _DB_PREFIX_ . "customer` WHERE `id_customer` = '" . pSQL ($id_customer) . "'";
 			$row_customer = Db::getInstance ()->GetRow ($sql);
 
 			// The user account exists, return it's identifier.
-			if (!empty ($row_customer ['id_customer']))
+			if (! empty ($row_customer ['id_customer']))
 			{
 				return $row_customer ['id_customer'];
 			}
 
 			// Delete the wrongly linked user_token.
-			$sql = "DELETE FROM `" . _DB_PREFIX_ . "oasl_user` WHERE `user_token` = '" . pSQL($user_token) . "' LIMIT 1";
+			$sql = "DELETE FROM `" . _DB_PREFIX_ . "oasl_user` WHERE `user_token` = '" . pSQL ($user_token) . "' LIMIT 1";
 			$result = Db::getInstance ()->execute ($sql);
 
 			// Delete the wrongly linked identity_token.
-			$sql = "DELETE FROM `" . _DB_PREFIX_ . "oasl_identity` WHERE `id_oasl_user` = '" . pSQL($id_oasl_user) . "'";
+			$sql = "DELETE FROM `" . _DB_PREFIX_ . "oasl_identity` WHERE `id_oasl_user` = '" . pSQL ($id_oasl_user) . "'";
 			$result = Db::getInstance ()->execute ($sql);
 		}
 
 		// No entry found.
 		return false;
 	}
-
 
 	/**
 	 * Extracts the social network data from a result-set returned by the OneAll API.
@@ -432,16 +426,16 @@ class oneall_social_login_tools
 				$data ['identity_provider'] = $identity->source->name;
 				$data ['identity_token'] = $identity->identity_token;
 				$data ['user_token'] = $social_data->response->result->data->user->user_token;
-				$data ['user_first_name'] = !empty ($identity->name->givenName) ? $identity->name->givenName : '';
-				$data ['user_last_name'] = !empty ($identity->name->familyName) ? $identity->name->familyName : '';
-				$data ['user_location'] = !empty ($identity->currentLocation) ? $identity->currentLocation : '';
+				$data ['user_first_name'] = ! empty ($identity->name->givenName) ? $identity->name->givenName : '';
+				$data ['user_last_name'] = ! empty ($identity->name->familyName) ? $identity->name->familyName : '';
+				$data ['user_location'] = ! empty ($identity->currentLocation) ? $identity->currentLocation : '';
 				$data ['user_constructed_name'] = trim ($data ['user_first_name'] . ' ' . $data ['user_last_name']);
-				$data ['user_picture'] = !empty ($identity->pictureUrl) ? $identity->pictureUrl : '';
-				$data ['user_thumbnail'] = !empty ($identity->thumbnailUrl) ? $identity->thumbnailUrl : '';
-				$data ['user_about_me'] = !empty ($identity->aboutMe) ? $identity->aboutMe : '';
+				$data ['user_picture'] = ! empty ($identity->pictureUrl) ? $identity->pictureUrl : '';
+				$data ['user_thumbnail'] = ! empty ($identity->thumbnailUrl) ? $identity->thumbnailUrl : '';
+				$data ['user_about_me'] = ! empty ($identity->aboutMe) ? $identity->aboutMe : '';
 
 				// Birthdate
-				if (!empty ($identity->birthday) && preg_match ('/^([0-9]{2})\/([0-9]{2})\/([0-9]{4})$/', $identity->birthday, $matches))
+				if (! empty ($identity->birthday) && preg_match ('/^([0-9]{2})\/([0-9]{2})\/([0-9]{4})$/', $identity->birthday, $matches))
 				{
 					$data ['user_birthdate'] = str_pad ($matches [3], 4, '0', STR_PAD_LEFT);
 					$data ['user_birthdate'] .= '-' . str_pad ($matches [2], 2, '0', STR_PAD_LEFT);
@@ -453,31 +447,31 @@ class oneall_social_login_tools
 				}
 
 				// Accounts
-				if (isset ($identity->accounts) AND is_array ($identity->accounts))
+				if (isset ($identity->accounts) and is_array ($identity->accounts))
 				{
-					$data ['accounts'] = array();
+					$data ['accounts'] = array ();
 
-					foreach ($identity->accounts AS $identity_account)
+					foreach ($identity->accounts as $identity_account)
 					{
-						$properties = get_object_vars($identity_account);
-						if (is_array ($properties) AND count ($properties) > 0)
+						$properties = get_object_vars ($identity_account);
+						if (is_array ($properties) and count ($properties) > 0)
 						{
-							$account = array();
-							foreach ($properties AS $property => $property_value)
+							$account = array ();
+							foreach ($properties as $property => $property_value)
 							{
-								$account[$property] = $property_value;
+								$account [$property] = $property_value;
 							}
-							$data ['accounts'][] = $account;
+							$data ['accounts'] [] = $account;
 						}
 					}
 				}
 
 				// Fullname.
-				if (!empty ($identity->name->formatted))
+				if (! empty ($identity->name->formatted))
 				{
 					$data ['user_full_name'] = $identity->name->formatted;
 				}
-				elseif (!empty ($identity->name->displayName))
+				elseif (! empty ($identity->name->displayName))
 				{
 					$data ['user_full_name'] = $identity->name->displayName;
 				}
@@ -487,11 +481,11 @@ class oneall_social_login_tools
 				}
 
 				// Preferred Username.
-				if (!empty ($identity->preferredUsername))
+				if (! empty ($identity->preferredUsername))
 				{
 					$data ['user_login'] = $identity->preferredUsername;
 				}
-				elseif (!empty ($identity->displayName))
+				elseif (! empty ($identity->displayName))
 				{
 					$data ['user_login'] = $identity->displayName;
 				}
@@ -505,27 +499,27 @@ class oneall_social_login_tools
 				if (property_exists ($identity, 'emails') && is_array ($identity->emails))
 				{
 					$data ['user_email_is_verified'] = false;
-					while ($data ['user_email_is_verified'] !== true && (list(, $obj) = each ($identity->emails)))
+					while ($data ['user_email_is_verified'] !== true && (list (, $obj) = each ($identity->emails)))
 					{
 						$data ['user_email'] = $obj->value;
-						$data ['user_email_is_verified'] = !empty ($obj->is_verified);
+						$data ['user_email_is_verified'] = ! empty ($obj->is_verified);
 					}
 				}
 
 				// Website/Homepage.
 				$data ['user_website'] = '';
-				if (!empty ($identity->profileUrl))
+				if (! empty ($identity->profileUrl))
 				{
 					$data ['user_website'] = $identity->profileUrl;
 				}
-				elseif (!empty ($identity->urls [0]->value))
+				elseif (! empty ($identity->urls [0]->value))
 				{
 					$data ['user_website'] = $identity->urls [0]->value;
 				}
 
 				// Gender
 				$data ['user_gender'] = 0;
-				if (!empty ($identity->gender))
+				if (! empty ($identity->gender))
 				{
 					switch ($identity->gender)
 					{
@@ -545,24 +539,22 @@ class oneall_social_login_tools
 		return false;
 	}
 
-
 	/**
 	 * Send an API request by using the given handler
 	 */
 	public static function do_api_request ($handler, $url, $options = array (), $timeout = 15)
 	{
-		//FSOCKOPEN
+		// FSOCKOPEN
 		if ($handler == 'fsockopen')
 		{
 			return self::do_fsockopen_request ($url, $options, $timeout);
 		}
-		//CURL
+		// CURL
 		else
 		{
 			return self::do_curl_request ($url, $options, $timeout);
 		}
 	}
-
 
 	/**
 	 * Check if fsockopen can be used
@@ -570,7 +562,7 @@ class oneall_social_login_tools
 	public static function check_fsockopen ($secure = true)
 	{
 		$result = self::do_fsockopen_request (($secure ? 'https' : 'http') . '://www.oneall.com/ping.html');
-		if (is_object ($result) AND property_exists ($result, 'http_code') AND $result->http_code == 200)
+		if (is_object ($result) and property_exists ($result, 'http_code') and $result->http_code == 200)
 		{
 			if (property_exists ($result, 'http_data'))
 			{
@@ -583,16 +575,15 @@ class oneall_social_login_tools
 		return false;
 	}
 
-
 	/**
 	 * Check if CURL can be used
 	 */
 	public static function check_curl ($secure = true)
 	{
-		if (in_array ('curl', get_loaded_extensions ()) AND function_exists ('curl_exec'))
+		if (in_array ('curl', get_loaded_extensions ()) and function_exists ('curl_exec'))
 		{
 			$result = self::do_curl_request (($secure ? 'https' : 'http') . '://www.oneall.com/ping.html');
-			if (is_object ($result) AND property_exists ($result, 'http_code') AND $result->http_code == 200)
+			if (is_object ($result) and property_exists ($result, 'http_code') and $result->http_code == 200)
 			{
 				if (property_exists ($result, 'http_data'))
 				{
@@ -606,16 +597,15 @@ class oneall_social_login_tools
 		return false;
 	}
 
-
 	/**
 	 * Sends a CURL request
 	 */
 	public static function do_curl_request ($url, $options = array (), $timeout = 15)
 	{
-		//Store the result
+		// Store the result
 		$result = new stdClass ();
 
-		//Send request
+		// Send request
 		$curl = curl_init ();
 		curl_setopt ($curl, CURLOPT_URL, $url);
 		curl_setopt ($curl, CURLOPT_HEADER, 0);
@@ -627,12 +617,12 @@ class oneall_social_login_tools
 		curl_setopt ($curl, CURLOPT_USERAGENT, 'SocialLogin PrestaShop (+http://www.oneall.com/)');
 
 		// BASIC AUTH?
-		if (isset ($options ['api_key']) AND isset ($options ['api_secret']))
+		if (isset ($options ['api_key']) and isset ($options ['api_secret']))
 		{
 			curl_setopt ($curl, CURLOPT_USERPWD, $options ['api_key'] . ":" . $options ['api_secret']);
 		}
 
-		//Make request
+		// Make request
 		if (($http_data = curl_exec ($curl)) !== false)
 		{
 			$result->http_code = curl_getinfo ($curl, CURLINFO_HTTP_CODE);
@@ -641,34 +631,33 @@ class oneall_social_login_tools
 		}
 		else
 		{
-			$result->http_code = -1;
+			$result->http_code = - 1;
 			$result->http_data = null;
 			$result->http_error = curl_error ($curl);
 		}
 
-		//Done
+		// Done
 		return $result;
 	}
-
 
 	/**
 	 * Sends an fsockopen request
 	 */
 	public static function do_fsockopen_request ($url, $options = array (), $timeout = 15)
 	{
-		//Store the result
+		// Store the result
 		$result = new stdClass ();
 
-		//Make that this is a valid URL
+		// Make that this is a valid URL
 		if (($uri = parse_url ($url)) == false)
 		{
-			$result->http_code = -1;
+			$result->http_code = - 1;
 			$result->http_data = null;
 			$result->http_error = 'invalid_uri';
 			return $result;
 		}
 
-		//Make sure we can handle the schema
+		// Make sure we can handle the schema
 		switch ($uri ['scheme'])
 		{
 			case 'http':
@@ -684,93 +673,88 @@ class oneall_social_login_tools
 				break;
 
 			default:
-				$result->http_code = -1;
+				$result->http_code = - 1;
 				$result->http_data = null;
 				$result->http_error = 'invalid_schema';
 				return $result;
 				break;
 		}
 
-		//Make sure the socket opened properly
-		if (!$fp)
+		// Make sure the socket opened properly
+		if (! $fp)
 		{
-			$result->http_code = -$errno;
+			$result->http_code = - $errno;
 			$result->http_data = null;
 			$result->http_error = trim ($errstr);
 			return $result;
 		}
 
-		//Construct the path to act on
+		// Construct the path to act on
 		$path = (isset ($uri ['path']) ? $uri ['path'] : '/');
 		if (isset ($uri ['query']))
 		{
 			$path .= '?' . $uri ['query'];
 		}
 
-		//Create HTTP request
-		$defaults = array (
-			'Host' => "Host: $host",
-			'User-Agent' => 'User-Agent: SocialLogin PrestaShop (+http://www.oneall.com/)'
-		);
+		// Create HTTP request
+		$defaults = array ('Host' => "Host: $host",'User-Agent' => 'User-Agent: SocialLogin PrestaShop (+http://www.oneall.com/)' );
 
 		// BASIC AUTH?
-		if (isset ($options ['api_key']) AND isset ($options ['api_secret']))
+		if (isset ($options ['api_key']) and isset ($options ['api_secret']))
 		{
 			$defaults ['Authorization'] = 'Authorization: Basic ' . base64_encode ($options ['api_key'] . ":" . $options ['api_secret']);
 		}
 
-		//Build and send request
+		// Build and send request
 		$request = 'GET ' . $path . " HTTP/1.0\r\n";
 		$request .= implode ("\r\n", $defaults);
 		$request .= "\r\n\r\n";
 		fwrite ($fp, $request);
 
-		//Fetch response
+		// Fetch response
 		$response = '';
-		while (!feof ($fp))
+		while (! feof ($fp))
 		{
 			$response .= fread ($fp, 1024);
 		}
 
-		//Close connection
+		// Close connection
 		fclose ($fp);
 
-		//Parse response
-		list($response_header, $response_body) = explode ("\r\n\r\n", $response, 2);
+		// Parse response
+		list ($response_header, $response_body) = explode ("\r\n\r\n", $response, 2);
 
-		//Parse header
+		// Parse header
 		$response_header = preg_split ("/\r\n|\n|\r/", $response_header);
-		list($header_protocol, $header_code, $header_status_message) = explode (' ', trim (array_shift ($response_header)), 3);
+		list ($header_protocol, $header_code, $header_status_message) = explode (' ', trim (array_shift ($response_header)), 3);
 
-		//Build result
+		// Build result
 		$result->http_code = $header_code;
 		$result->http_data = $response_body;
 
-		//Done
+		// Done
 		return $result;
 	}
-
 
 	/**
 	 * Returns the current url
 	 */
 	public static function get_current_url ()
 	{
-		//Get request URI - Should work on Apache + IIS
-		$request_uri = ((!isset ($_SERVER ['REQUEST_URI'])) ? $_SERVER ['PHP_SELF'] : $_SERVER ['REQUEST_URI']);
-		$request_port = ((!empty ($_SERVER ['SERVER_PORT']) AND $_SERVER ['SERVER_PORT'] <> '80') ? (":" . $_SERVER ['SERVER_PORT']) : '');
+		// Get request URI - Should work on Apache + IIS
+		$request_uri = ((! isset ($_SERVER ['REQUEST_URI'])) ? $_SERVER ['PHP_SELF'] : $_SERVER ['REQUEST_URI']);
+		$request_port = ((! empty ($_SERVER ['SERVER_PORT']) and $_SERVER ['SERVER_PORT'] != '80') ? (":" . $_SERVER ['SERVER_PORT']) : '');
 		$request_protocol = (self::is_https_on () ? 'https' : 'http') . "://";
 		$redirect_to = $request_protocol . $_SERVER ['HTTP_HOST'] . $request_port . $request_uri;
 		return $redirect_to;
 	}
-
 
 	/**
 	 * Check if the current connection is being made over https
 	 */
 	public static function is_https_on ()
 	{
-		if (!empty ($_SERVER ['SERVER_PORT']))
+		if (! empty ($_SERVER ['SERVER_PORT']))
 		{
 			if (trim ($_SERVER ['SERVER_PORT']) == '443')
 			{
@@ -778,7 +762,7 @@ class oneall_social_login_tools
 			}
 		}
 
-		if (!empty ($_SERVER ['HTTP_X_FORWARDED_PROTO']))
+		if (! empty ($_SERVER ['HTTP_X_FORWARDED_PROTO']))
 		{
 			if (strtolower (trim ($_SERVER ['HTTP_X_FORWARDED_PROTO'])) == 'https')
 			{
@@ -786,9 +770,9 @@ class oneall_social_login_tools
 			}
 		}
 
-		if (!empty ($_SERVER ['HTTPS']))
+		if (! empty ($_SERVER ['HTTPS']))
 		{
-			if (strtolower (trim ($_SERVER ['HTTPS'])) == 'on' OR trim ($_SERVER ['HTTPS']) == '1')
+			if (strtolower (trim ($_SERVER ['HTTPS'])) == 'on' or trim ($_SERVER ['HTTPS']) == '1')
 			{
 				return true;
 			}

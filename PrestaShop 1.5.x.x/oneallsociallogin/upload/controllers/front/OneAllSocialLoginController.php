@@ -1,7 +1,8 @@
 <?php
+
 /**
  * @package   	OneAll Social Login
- * @copyright 	Copyright 2014 http://www.oneall.com - All rights reserved.
+ * @copyright 	Copyright 2011-2015 http://www.oneall.com - All rights reserved
  * @license   	GNU/GPL 2 or later
  *
  * This program is free software; you can redistribute it and/or
@@ -22,6 +23,8 @@
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
  */
+
+// Front Controller for additional user data.
 class OneAllSocialLoginController extends FrontController
 {
 	public $auth = false;
@@ -48,12 +51,12 @@ class OneAllSocialLoginController extends FrontController
 
 		// Restore back value
 		$back = Tools::getValue ('back');
-		if (!empty ($back))
+		if (! empty ($back))
 		{
 			$this->context->smarty->assign ('back', Tools::safeOutput ($back));
 		}
 
-		//	Did an error occur?
+		// Did an error occur?
 		$have_error = true;
 
 		// The cookie is required to proceed.
@@ -62,12 +65,12 @@ class OneAllSocialLoginController extends FrontController
 			// Extract the data
 			$data = unserialize (base64_decode ($this->context->cookie->oasl_data));
 
-			//Check data format
+			// Check data format
 			if (is_array ($data))
 			{
 				$have_error = false;
 
-				//Submit Button Clicked
+				// Submit Button Clicked
 				if (Tools::isSubmit ('submit'))
 				{
 					// Reset Errors.
@@ -84,7 +87,7 @@ class OneAllSocialLoginController extends FrontController
 						$this->errors [] = Tools::displayError ('Please enter your first name');
 					}
 					// Make sure the format of the firstname is correct.
-					elseif (!Validate::isName ($firstname))
+					elseif (! Validate::isName ($firstname))
 					{
 						$this->errors [] = Tools::displayError ('Please enter a valid first name');
 					}
@@ -95,7 +98,7 @@ class OneAllSocialLoginController extends FrontController
 						$this->errors [] = Tools::displayError ('Please enter your lastname');
 					}
 					// Make sure the format of the lastname is correct.
-					elseif (!Validate::isName ($lastname))
+					elseif (! Validate::isName ($lastname))
 					{
 						$this->errors [] = Tools::displayError ('Please enter a valid last name');
 					}
@@ -106,7 +109,7 @@ class OneAllSocialLoginController extends FrontController
 						$this->errors [] = Tools::displayError ('Please enter your email address');
 					}
 					// Make sure the format of the email address is correct.
-					elseif (!Validate::isEmail ($email))
+					elseif (! Validate::isEmail ($email))
 					{
 						$this->errors [] = Tools::displayError ('Please enter a valid email address');
 					}
@@ -125,21 +128,21 @@ class OneAllSocialLoginController extends FrontController
 						$data ['user_last_name'] = ucwords (strtolower ($lastname));
 
 						// Email flags.
-						$send_email_to_admin = ((Configuration::get ('OASL_EMAIL_ADMIN_DISABLE') <> 1) ? true : false);
-						$send_email_to_customer = ((Configuration::get ('OASL_EMAIL_CUSTOMER_DISABLE') <> 1) ? true : false);
+						$send_email_to_admin = ((Configuration::get ('OASL_EMAIL_ADMIN_DISABLE') != 1) ? true : false);
+						$send_email_to_customer = ((Configuration::get ('OASL_EMAIL_CUSTOMER_DISABLE') != 1) ? true : false);
 
 						// Create a new account.
 						$id_customer = oneall_social_login_tools::create_customer_from_data ($data, $send_email_to_admin, $send_email_to_customer);
 
 						// Login
-						if (!empty ($id_customer) AND oneall_social_login_tools::login_customer ($id_customer))
+						if (! empty ($id_customer) and oneall_social_login_tools::login_customer ($id_customer))
 						{
-							//Remove the data
+							// Remove the data
 							unset ($this->context->cookie->oasl_data);
 
-							//A refresh is required to update the page
+							// A refresh is required to update the page
 							$back = trim (Tools::getValue ('back'));
-							$back = (!empty ($back) ? $back : oneall_social_login_tools::get_current_url ());
+							$back = (! empty ($back) ? $back : oneall_social_login_tools::get_current_url ());
 							Tools::redirect ($back);
 						}
 					}
