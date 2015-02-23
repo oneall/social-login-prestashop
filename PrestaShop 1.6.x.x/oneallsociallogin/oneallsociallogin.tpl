@@ -103,7 +103,7 @@
 {/if}
 
 {if {$oasl_widget_location} eq 'custom'}
-	<div class="oneall_social_login_providers oneall_social_login_providers_custom" id="oneall_social_login_providers_{$oasl_widget_rnd}"></div>
+	<div class="oneall_social_login_providers oneall_social_login_providers_custom" id="oneall_social_login_providers_{$oasl_widget_rnd}">
 		<script type="text/javascript">
 			var _oneall = _oneall || [];
 			_oneall.push(['social_login', 'set_providers', [{$oasl_widget_providers}]]);
