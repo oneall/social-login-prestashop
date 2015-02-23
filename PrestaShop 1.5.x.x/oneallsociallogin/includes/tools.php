@@ -741,12 +741,34 @@ class oneall_social_login_tools
 	 */
 	public static function get_current_url ()
 	{
-		// Get request URI - Should work on Apache + IIS
-		$request_uri = ((! isset ($_SERVER ['REQUEST_URI'])) ? $_SERVER ['PHP_SELF'] : $_SERVER ['REQUEST_URI']);
-		$request_port = ((! empty ($_SERVER ['SERVER_PORT']) and $_SERVER ['SERVER_PORT'] != '80') ? (":" . $_SERVER ['SERVER_PORT']) : '');
-		$request_protocol = (self::is_https_on () ? 'https' : 'http') . "://";
-		$redirect_to = $request_protocol . $_SERVER ['HTTP_HOST'] . $request_port . $request_uri;
-		return $redirect_to;
+		//Get request URI - Should work on Apache + IIS
+		$request_uri = (isset ($_SERVER ['REQUEST_URI']) ? $_SERVER ['REQUEST_URI'] : $_SERVER ['PHP_SELF']);
+		$request_protocol = (self::is_https_on () ? 'https' : 'http');
+		$request_host = (isset ($_SERVER ['HTTP_X_FORWARDED_HOST']) ? $_SERVER ['HTTP_X_FORWARDED_HOST'] : (isset ($_SERVER ['HTTP_HOST']) ? $_SERVER ['HTTP_HOST'] : $_SERVER ['SERVER_NAME']));
+
+		// Make sure we strip $request_host so we got no double ports un $current_url
+		$request_host = preg_replace('/:[0-9]*$/', '', $request_host);
+
+		//We are using a proxy
+		if (isset ($_SERVER ['HTTP_X_FORWARDED_PORT']))
+		{
+			// SERVER_PORT is usually wrong on proxies, don't use it!
+			$request_port = intval ($_SERVER ['HTTP_X_FORWARDED_PORT']);
+		}
+		//Does not seem like a proxy
+		elseif (isset ($_SERVER ['SERVER_PORT']))
+		{
+			$request_port = intval ($_SERVER ['SERVER_PORT']);
+		}
+
+		// Remove standard ports
+		$request_port = (!in_array ($request_port, array (80, 443)) ? $request_port : '');
+
+		//Build url
+		$current_url = $request_protocol . '://' . $request_host . ( ! empty ($request_port) ? (':'.$request_port) : '') . $request_uri;
+
+		//Done
+		return $current_url;
 	}
 
 	/**
