@@ -2,7 +2,7 @@
 	<module>
 	<name>oneallsociallogin</name>
 	<displayName>OneAll Social Login</displayName>
-	<version>1.6</version>
+	<version>1.7</version>
 	<description><![CDATA[Allows your users to register and login to your PrestaShop with their existing social network account (Twitter, Facebook, LinkedIn, Google ...)]]></description>
 	<author>OneAll</author>
 	<tab>administration</tab>
