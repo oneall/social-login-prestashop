@@ -103,13 +103,12 @@
 {/if}
 
 {if {$oasl_widget_location} eq 'custom'}
-	<div class="oneall_social_login_providers oneall_social_login_providers_custom" id="oneall_social_login_providers_{$oasl_widget_rnd}">
-		<script type="text/javascript">
-			var _oneall = _oneall || [];
-			_oneall.push(['social_login', 'set_providers', [{$oasl_widget_providers}]]);
-			_oneall.push(['social_login', 'set_callback_uri', window.location.href]);
-			_oneall.push(['social_login', 'set_custom_css_uri', '{$oasl_widget_css}']);
-  		_oneall.push(['social_login', 'do_render_ui', 'oneall_social_login_providers_{$oasl_widget_rnd}']);		
-		</script>
-	</div>
+	<div class="oneall_social_login_providers oneall_social_login_providers_custom" id="oneall_social_login_providers_{$oasl_widget_rnd}"></div>
+	<script type="text/javascript">
+		var _oneall = _oneall || [];
+		_oneall.push(['social_login', 'set_providers', [{$oasl_widget_providers}]]);
+		_oneall.push(['social_login', 'set_callback_uri', window.location.href]);
+		_oneall.push(['social_login', 'set_custom_css_uri', '{$oasl_widget_css}']);
+  	_oneall.push(['social_login', 'do_render_ui', 'oneall_social_login_providers_{$oasl_widget_rnd}']);		
+	</script>	
 {/if}
