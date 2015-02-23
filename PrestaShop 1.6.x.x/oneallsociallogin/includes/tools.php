@@ -799,6 +799,9 @@ class oneall_social_login_tools
 		$request_protocol = (self::is_https_on () ? 'https' : 'http');
 		$request_host = (isset ($_SERVER ['HTTP_X_FORWARDED_HOST']) ? $_SERVER ['HTTP_X_FORWARDED_HOST'] : (isset ($_SERVER ['HTTP_HOST']) ? $_SERVER ['HTTP_HOST'] : $_SERVER ['SERVER_NAME']));
 
+		// Make sure we strip $request_host so we got no double ports un $current_url
+		$request_host = preg_replace('/:?\d?\d?\d?\d?\d?$/', '', $request_host);
+
 		//We are using a proxy
 		if (isset ($_SERVER ['HTTP_X_FORWARDED_PORT']))
 		{
