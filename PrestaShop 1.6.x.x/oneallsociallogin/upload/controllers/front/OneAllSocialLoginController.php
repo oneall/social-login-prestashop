@@ -74,39 +74,39 @@ class OneAllSocialLoginController extends FrontController
 					// Make sure the firstname is not empty.
 					if (strlen ($firstname) == 0)
 					{
-						$this->errors [] = Tools::displayError ('Please enter your first name');
+						$this->errors [] = Tools::displayError ($this->l('Please enter your first name'));
 					}
 					// Make sure the format of the firstname is correct.
 					elseif (!Validate::isName ($firstname))
 					{
-						$this->errors [] = Tools::displayError ('Please enter a valid first name');
+						$this->errors [] = Tools::displayError ($this->l('Please enter a valid first name'));
 					}
 
 					// Make sure the lastname is not empty.
 					if (strlen ($lastname) == 0)
 					{
-						$this->errors [] = Tools::displayError ('Please enter your lastname');
+						$this->errors [] = Tools::displayError ($this->l('Please enter your lastname'));
 					}
 					// Make sure the format of the lastname is correct.
 					elseif (!Validate::isName ($lastname))
 					{
-						$this->errors [] = Tools::displayError ('Please enter a valid last name');
+						$this->errors [] = Tools::displayError ($this->l('Please enter a valid last name'));
 					}
 
 					// Make sure the email address it is not empty.
 					if (strlen ($email) == 0)
 					{
-						$this->errors [] = Tools::displayError ('Please enter your email address');
+						$this->errors [] = Tools::displayError ($this->l('Please enter your email address'));
 					}
 					// Make sure the format of the email address is correct.
 					elseif (!Validate::isEmail ($email))
 					{
-						$this->errors [] = Tools::displayError ('Please enter a valid email address');
+						$this->errors [] = Tools::displayError ($this->l('Please enter a valid email address'));
 					}
 					// Make sure the email address is not already taken.
 					elseif (oneall_social_login_tools::get_id_customer_for_email_address ($email) !== false)
 					{
-						$this->errors [] = Tools::displayError ('This email address is already taken');
+						$this->errors [] = Tools::displayError ($this->l('This email address is already taken'));
 					}
 
 					// We are good to go.
