@@ -57,7 +57,7 @@
 				<hr />
 				<div class="submit">
 					{if isset($back)}<input type="hidden" class="hidden" name="back" value="{$back|escape:'htmlall':'UTF-8'}" />{/if}
-					<button name="submit" id="submit" type="submit" class="btn btn-default button button-medium"><span>Confirm<i class="icon-chevron-right right"></i></span></button>
+					<button name="submit" id="submit" type="submit" class="btn btn-default button button-medium"><span>{l s='Confirm'}<i class="icon-chevron-right right"></i></span></button>
 				</div>
 			</div>
 		</fieldset>
