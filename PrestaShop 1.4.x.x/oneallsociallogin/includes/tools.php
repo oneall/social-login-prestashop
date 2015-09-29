@@ -26,6 +26,9 @@
 //OneAll Social Login Toolbox
 class oneall_social_login_tools
 {
+	
+	const USER_AGENT = 'SocialLogin/1.1 PrestaShop/1.4.x.x (+http://www.oneall.com/)';
+	
 	/**
 	* Logs a given customer in.
 	*/
@@ -619,7 +622,7 @@ class oneall_social_login_tools
 		curl_setopt ($curl, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt ($curl, CURLOPT_SSL_VERIFYPEER, 0);
 		curl_setopt ($curl, CURLOPT_SSL_VERIFYHOST, 0);
-		curl_setopt ($curl, CURLOPT_USERAGENT, 'SocialLogin PrestaShop (+http://www.oneall.com/)');
+		curl_setopt ($curl, CURLOPT_USERAGENT, self::USER_AGENT);
 
 		// BASIC AUTH?
 		if (isset ($options ['api_key']) AND isset ($options ['api_secret']))
@@ -705,7 +708,7 @@ class oneall_social_login_tools
 		//Create HTTP request
 		$defaults = array (
 			'Host' => "Host: $host",
-			'User-Agent' => 'User-Agent: SocialLogin PrestaShop (+http://www.oneall.com/)'
+			'User-Agent' => 'User-Agent: ' . self::USER_AGENT
 		);
 
 		// BASIC AUTH?
