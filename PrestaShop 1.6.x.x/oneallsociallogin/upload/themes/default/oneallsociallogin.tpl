@@ -24,7 +24,7 @@
 
 {capture name=path}{l s='Create an account'}{/capture}
 
-<h1 class="page-heading bottom-indent">{l s='You have connected with %s !' sprintf=$identity_provider}</h1>
+<h1 class="page-heading bottom-indent">{l s='You have connected with'} {$identity_provider}!</h1>
 <p>
 	{l s='Please take a minute to review and complete your account information.'}
 	{l s='Once you have reviewed your details, your account is ready to use and you can sign in with %s.' sprintf=$identity_provider}
