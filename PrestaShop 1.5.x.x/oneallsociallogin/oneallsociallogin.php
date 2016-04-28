@@ -517,14 +517,6 @@ class OneallSocialLogin extends Module
 			return false;
 		}
 
-		// Drop user_token table
-		$query = 'DROP table IF EXISTS `' . _DB_PREFIX_ . 'oasl_user`';
-		Db::getInstance ()->execute ($query);
-
-		// Drop identity_token table
-		$query = 'DROP table IF EXISTS `' . _DB_PREFIX_ . 'oasl_identity`';
-		Db::getInstance ()->execute ($query);
-
 		// Remove controller files.
 		$files = $this->get_files_to_install ();
 		foreach ($files as $file_name => $file_data)
