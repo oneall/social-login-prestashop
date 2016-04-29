@@ -334,7 +334,7 @@ class oneall_social_login_tools
 		$mail_vars['{email}'] = $customer->email;
 
 		//Read the first employe - should be the board owner
-		$sql = "SELECT `firstname`, `lastname`, `email` FROM `" . _DB_PREFIX_ . "employee` WHERE id_profile=1";
+		$sql = "SELECT `firstname`, `lastname`, `email` FROM `" . _DB_PREFIX_ . "employee` WHERE id_profile="._PS_ADMIN_PROFILE_;
 		$employees = Db::getInstance ()->ExecuteS ($sql);
 		if (is_array ($employees) AND count ($employees) > 0)
 		{
