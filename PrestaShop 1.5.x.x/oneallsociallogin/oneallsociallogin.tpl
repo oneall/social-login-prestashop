@@ -32,7 +32,11 @@
 
 {if {$oasl_widget_location} eq 'left'}
 	<div class="block oneall_social_login_block" id="oneall_social_login_block_left">
-		<p class="title_block">{l s='Connect with:' mod='oneallsociallogin'}</p>
+	{capture name='oneallsociallogin_title'}{l s='Connect with:' mod='oneallsociallogin'}{/capture}
+	{assign var='oasl_translated_title' value=$smarty.capture.oneallsociallogin_title}
+	{if {$oasl_translated_title|strip} neq ' '}
+		<p class="title_block">{$oasl_translated_title}</p>
+	{/if}
 		<p class="block_content">
 			<div class="oneall_social_login_providers" id="oneall_social_login_providers_{$oasl_widget_rnd}"></div>
 			<script type="text/javascript">
@@ -60,7 +64,11 @@
 
 {if {$oasl_widget_location} eq 'right'}
 	<div class="block oneall_social_login_block" id="oneall_social_login_block_right">
-		<p class="title_block">{l s='Connect with:' mod='oneallsociallogin'}</p>
+	{capture name='oneallsociallogin_title'}{l s='Connect with:' mod='oneallsociallogin'}{/capture}
+	{assign var='oasl_translated_title' value=$smarty.capture.oneallsociallogin_title}
+	{if {$oasl_translated_title|strip} neq ' '}
+		<p class="title_block">{$oasl_translated_title}</p>
+	{/if}
 		<p class="block_content">
 			<div class="oneall_social_login_providers" id="oneall_social_login_providers_{$oasl_widget_rnd}"></div>
 			<script type="text/javascript">
