@@ -22,7 +22,7 @@
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
  */
-class OneAllSocialLoginController extends FrontController
+class OneAllSocialLoginModuleFrontController extends ModuleFrontController
 {
 	public $auth = false;
 	public $php_self = 'oneallsociallogin';
@@ -152,7 +152,7 @@ class OneAllSocialLoginController extends FrontController
 				$smarty->assign ('identity_provider', $data ['identity_provider']);
 
 				// Show our template.
-				$this->setTemplate (_PS_THEME_DIR_ . 'oneallsociallogin.tpl');
+				$this->setTemplate ('oneallsociallogin.tpl');
 			}
 		}
 

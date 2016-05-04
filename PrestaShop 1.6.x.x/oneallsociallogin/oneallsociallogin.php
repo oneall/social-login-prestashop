@@ -36,9 +36,10 @@ class OneallSocialLogin extends Module
 	{
 		$this->name = 'oneallsociallogin';
 		$this->tab = 'administration';
-		$this->version = '1.7';
+		$this->version = '1.8';
 		$this->author = 'OneAll LLC';
 		$this->need_instance = 0;
+		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.6');
 		$this->module_key = '2571f9dab09af193a8ca375a09133873';
 		$this->secure_key = Tools::encrypt ($this->name);
 
@@ -57,18 +58,9 @@ class OneallSocialLogin extends Module
 			Configuration::updateValue ('OASL_API_PORT', '443');
 			Configuration::updateValue ('OASL_PROVIDERS', 'facebook,twitter,google,linkedin');
 			Configuration::updateValue ('OASL_LINK_ACCOUNT_DISABLE', 0);
-
-			Configuration::updateValue ('OASL_CUSTOM_TITLE', $this->l ('Connect with:'));
-
 			Configuration::updateValue ('OASL_JS_HOOK_AUTH_DISABLE', 0);
-			Configuration::updateValue ('OASL_JS_HOOK_AUTH_TITLE', $this->l ('Connect with:'));
-
 			Configuration::updateValue ('OASL_HOOK_LEFT_DISABLE', 0);
-			Configuration::updateValue ('OASL_HOOK_LEFT_TITLE', $this->l ('Connect with:'));
-
 			Configuration::updateValue ('OASL_HOOK_RIGHT_DISABLE', 0);
-			Configuration::updateValue ('OASL_HOOK_RIGHT_TITLE', $this->l ('Connect with:'));
-
 			Configuration::updateValue ('OASL_DATA_HANDLING', 'verify');
 			Configuration::updateValue ('OASL_EMAIL_CUSTOMER_DISABLE', '0');
 			Configuration::updateValue ('OASL_EMAIL_ADMIN_DISABLE', '0');
@@ -103,8 +95,8 @@ class OneallSocialLogin extends Module
 
 		// Add external files.
 		$this->context = Context::getContext ();
-		$this->context->controller->addCSS ($this->_path . 'assets/css/admin.css');
-		$this->context->controller->addJS ($this->_path . 'assets/js/admin.js');
+		$this->context->controller->addCSS ($this->_path . 'views/css/admin.css');
+		$this->context->controller->addJS ($this->_path . 'views/js/admin.js');
 
 		// This is what is being displayed.
 		$html = '';
@@ -146,18 +138,14 @@ class OneallSocialLogin extends Module
 
 			//Hook Left
 			$hook_left_disable = (Tools::getValue ('OASL_HOOK_LEFT_DISABLE') == 1 ? 1 : 0);
-			$hook_left_title = trim (Tools::getValue ('OASL_HOOK_LEFT_TITLE'));
 
 			//Hook Right
 			$hook_right_disable = (Tools::getValue ('OASL_HOOK_RIGHT_DISABLE') == 1 ? 1 : 0);
-			$hook_right_title = trim (Tools::getValue ('OASL_HOOK_RIGHT_TITLE'));
 
 			//JavaScript Hook for Authentication
 			$js_hook_auth_disable = (Tools::getValue ('OASL_JS_HOOK_AUTH_DISABLE') == 1 ? 1 : 0);
-			$js_hook_auth_title = trim (Tools::getValue ('OASL_JS_HOOK_AUTH_TITLE'));
 
 			//Settings
-			$custom_title = trim (Tools::getValue ('OASL_CUSTOM_TITLE'));
 			$link_account_disable = (Tools::getValue ('OASL_LINK_ACCOUNT_DISABLE') == 1 ? 1 : 0);
 			$data_handling = Tools::getValue ('OASL_DATA_HANDLING');
 			$data_handling = (in_array ($data_handling, array ('ask', 'verify', 'auto')) ? $data_handling : 'verify');
@@ -173,13 +161,9 @@ class OneallSocialLogin extends Module
 			Configuration::updateValue ('OASL_API_HANDLER', $api_handler);
 			Configuration::updateValue ('OASL_API_PORT', $api_port);
 			Configuration::updateValue ('OASL_PROVIDERS', implode (',', $use_provider_keys));
-			Configuration::updateValue ('OASL_CUSTOM_TITLE', $custom_title);
 			Configuration::updateValue ('OASL_JS_HOOK_AUTH_DISABLE', $js_hook_auth_disable);
-			Configuration::updateValue ('OASL_JS_HOOK_AUTH_TITLE', $js_hook_auth_title);
 			Configuration::updateValue ('OASL_HOOK_LEFT_DISABLE', $hook_left_disable);
-			Configuration::updateValue ('OASL_HOOK_LEFT_TITLE', $hook_left_title);
 			Configuration::updateValue ('OASL_HOOK_RIGHT_DISABLE', $hook_right_disable);
-			Configuration::updateValue ('OASL_HOOK_RIGHT_TITLE', $hook_right_title);
 			Configuration::updateValue ('OASL_LINK_ACCOUNT_DISABLE', $link_account_disable);
 			Configuration::updateValue ('OASL_DATA_HANDLING', $data_handling);
 			Configuration::updateValue ('OASL_EMAIL_ADMIN_DISABLE', $email_admin_disable);
@@ -199,19 +183,14 @@ class OneallSocialLogin extends Module
 
 		//Hook Left
 		$hook_left_disable = Configuration::get ('OASL_HOOK_LEFT_DISABLE') == 1 ? 1 : 0;
-		$hook_left_title = Configuration::get ('OASL_HOOK_LEFT_TITLE');
 
 		//Hook Right
 		$hook_right_disable = Configuration::get ('OASL_HOOK_RIGHT_DISABLE') == 1 ? 1 : 0;
-		$hook_right_title = Configuration::get ('OASL_HOOK_RIGHT_TITLE');
 
 		//JavaScript Hook for Authentication
 		$js_hook_auth_disable = Configuration::get ('OASL_JS_HOOK_AUTH_DISABLE') == 1 ? 1 : 0;
-		$js_hook_auth_title = Configuration::get ('OASL_JS_HOOK_AUTH_TITLE');
-
 
 		//Settings
-		$custom_title = Configuration::get ('OASL_CUSTOM_TITLE');
 		$link_account_disable = Configuration::get ('OASL_LINK_ACCOUNT_DISABLE') == 1 ? 1 : 0;
 		$data_handling = Configuration::get ('OASL_DATA_HANDLING');
 		$data_handling = (in_array ($data_handling, array ('ask', 'verify', 'auto')) ? $data_handling : 'verify');
@@ -304,12 +283,7 @@ class OneallSocialLogin extends Module
 				</div>
 				<label style="width:300px;text-align:left"><code>&lt;div id=&quot;oneall_social_login_box&quot;&gt;&lt;/div&gt;</code></label>
 				<div style="margin-bottom: 20px;">
-						' . $this->l ('Use this code to display the Social Login buttons inside of a box and with the following title') . '
-				</div>
-				<label>' . $this->l ('Custom Social Login Box Caption') . ':</label>
-				<div class="margin-form">
-					<input type="text" name="OASL_CUSTOM_TITLE" id="OASL_CUSTOM_TITLE" size="60" value="' . htmlspecialchars ($custom_title) . '" />
-					<p>	' . $this->l ('Leave empty for none.') . '</p>
+						' . $this->l ('Use this code to display the Social Login buttons inside of a box and with a title') . '
 				</div>
 			</fieldset>
 
@@ -321,11 +295,6 @@ class OneallSocialLogin extends Module
 					<input type="radio" name="OASL_JS_HOOK_AUTH_DISABLE" id="OASL_JS_HOOK_AUTH_DISABLE_0" value="0" ' . ($js_hook_auth_disable <> 1 ? 'checked="checked"' : '') . ' /> ' . $this->l ('Enable') . '&nbsp;
 					<input type="radio" name="OASL_JS_HOOK_AUTH_DISABLE" id="OASL_JS_HOOK_AUTH_DISABLE_1" value="1" ' . ($js_hook_auth_disable == 1 ? 'checked="checked"' : '') . ' /> ' . $this->l ('Disable') . '<br />
 				</div>
-				<label>' . $this->l ('Authentication Page Caption') . ':</label>
-				<div class="margin-form">
-					<input type="text" name="OASL_JS_HOOK_AUTH_TITLE" id="OASL_JS_HOOK_AUTH_TITLE" size="60" value="' . htmlspecialchars ($js_hook_auth_title) . '" />
-					<p>	' . $this->l ('Leave empty for none.') . '</p>
-				</div>
 			</fieldset>
 
 			<fieldset style="margin-top:20px">
@@ -336,11 +305,6 @@ class OneallSocialLogin extends Module
 					<input type="radio" name="OASL_HOOK_LEFT_DISABLE" id="OASL_HOOK_LEFT_DISABLE_0" value="0" ' . ($hook_left_disable <> 1 ? 'checked="checked"' : '') . ' /> ' . $this->l ('Enable') . '&nbsp;
 					<input type="radio" name="OASL_HOOK_LEFT_DISABLE" id="OASL_HOOK_LEFT_DISABLE_1" value="1" ' . ($hook_left_disable == 1 ? 'checked="checked"' : '') . ' /> ' . $this->l ('Disable') . '<br />
 				</div>
-				<label>' . $this->l ('Left Side Caption') . ':</label>
-				<div class="margin-form">
-					<input type="text" name="OASL_HOOK_LEFT_TITLE" id="OASL_HOOK_LEFT_TITLE" size="60" value="' . htmlspecialchars ($hook_left_title) . '" />
-					<p>	' . $this->l ('Leave empty for none.') . '</p>
-				</div>
 			</fieldset>
 
 			<fieldset style="margin-top:20px">
@@ -350,11 +314,6 @@ class OneallSocialLogin extends Module
 				<div class="margin-form" style="margin-bottom: 20px;">
 					<input type="radio" name="OASL_HOOK_RIGHT_DISABLE" id="OASL_HOOK_RIGHT_DISABLE_0" value="0" ' . ($hook_right_disable <> 1 ? 'checked="checked"' : '') . ' /> ' . $this->l ('Enable') . '&nbsp;
 					<input type="radio" name="OASL_HOOK_RIGHT_DISABLE" id="OASL_HOOK_RIGHT_DISABLE_1" value="1" ' . ($hook_right_disable == 1 ? 'checked="checked"' : '') . ' /> ' . $this->l ('Disable') . '<br />
-				</div>
-				<label>' . $this->l ('Right Side Caption') . ':</label>
-				<div class="margin-form">
-					<input type="text" name="OASL_HOOK_RIGHT_TITLE" id="OASL_HOOK_RIGHT_TITLE" size="60" value="' . htmlspecialchars ($hook_right_title) . '" />
-					<p>' . $this->l ('Leave empty for none.') . '</p>
 				</div>
 			</fieldset>
 
@@ -481,7 +440,7 @@ class OneallSocialLogin extends Module
 	protected function get_files_to_install ()
 	{
 		return array (
-			'OneAllSocialLoginController.php' => array (
+			/*'OneAllSocialLoginController.php' => array (
 				'source' => _PS_MODULE_DIR_ . $this->name . '/upload/controllers/front/',
 				'target' => _PS_ROOT_DIR_ . '/controllers/front/'
 			),
@@ -492,7 +451,7 @@ class OneallSocialLogin extends Module
 			'oneallsociallogin.js' => array (
 				'source' => _PS_MODULE_DIR_ . $this->name . '/upload/js/',
 				'target' => _PS_ROOT_DIR_ . '/js/'
-			),
+			),*/
 			'oneallsociallogin_account.html' => array (
 				'source' => _PS_MODULE_DIR_ . $this->name . '/upload/mails/en/',
 				'target' => _PS_MAIL_DIR_ . 'en/'
@@ -679,16 +638,17 @@ class OneallSocialLogin extends Module
 			//Default
 			$widget_enable = false;
 			$widget_location = 'unspecified';
-			$widget_title = '';
 
 			//Check what has to be done
 			switch ($target)
 			{
 				//Customer Account Form
 				case 'customer_account_form':
-					$widget_enable = true;
-					$widget_location = 'top';
-					$widget_title = Configuration::get ('OASL_HOOK_RIGHT_TITLE');
+					if (Configuration::get ('OASL_JS_HOOK_AUTH_DISABLE') <> 1)
+					{
+						$widget_enable = true;
+						$widget_location = 'top';
+					}
 					break;
 
 				//Left Column
@@ -697,7 +657,6 @@ class OneallSocialLogin extends Module
 					{
 						$widget_enable = true;
 						$widget_location = 'left';
-						$widget_title = Configuration::get ('OASL_HOOK_LEFT_TITLE');
 					}
 					break;
 
@@ -707,15 +666,12 @@ class OneallSocialLogin extends Module
 					{
 						$widget_enable = true;
 						$widget_location = 'right';
-						$widget_title = Configuration::get ('OASL_HOOK_RIGHT_TITLE');
 					}
 					break;
 
-				//Right Column
 				case 'custom':
 					$widget_enable = true;
 					$widget_location = 'custom';
-					$widget_title = '';
 					break;
 			}
 
@@ -727,14 +683,13 @@ class OneallSocialLogin extends Module
 				if (is_array ($providers) AND count ($providers) > 0)
 				{
 					//Setup placeholders
-					$smarty->assign ('oasl_widget_title', $widget_title);
 					$smarty->assign ('oasl_widget_location', $widget_location);
 					$smarty->assign ('oasl_widget_rnd', mt_rand (99999, 9999999));
 					$smarty->assign ('oasl_widget_css', '');
 					$smarty->assign ('oasl_widget_providers', '"' . implode ('","', $providers) . '"');
 
 					//Display template
-					return $this->display (__FILE__, 'oneallsociallogin.tpl');
+					return $this->display (__FILE__, 'oasl_library.tpl');
 				}
 			}
 		}
@@ -751,7 +706,7 @@ class OneallSocialLogin extends Module
 
 
 	/**
-	 * Hook: Customer Account Form Top
+	 * Hook: Customer Account Form
 	 **/
 	public function hookDisplayCustomerAccountForm ($params)
 	{
@@ -801,9 +756,7 @@ class OneallSocialLogin extends Module
 
 			// Add the OneAll Social Library.
 			$smarty->assign ('oasl_widget_location', 'library');
-			$smarty->assign ('oasl_custom_title', Configuration::get ('OASL_CUSTOM_TITLE'));
 
-			$smarty->assign ('oasl_auth_title', Configuration::get ('OASL_JS_HOOK_AUTH_TITLE'));
 			$smarty->assign ('oasl_auth_disable', (Configuration::get ('OASL_JS_HOOK_AUTH_DISABLE') == 1 ? 1 : 0 ));
 
 			$smarty->assign ('oasl_subdomain', $api_subdomain);
@@ -817,10 +770,10 @@ class OneallSocialLogin extends Module
 			}
 
 			//Add Our JavaScript
-			$this->context->controller->addJs(_PS_ROOT_DIR_ . '/js/oneallsociallogin.js');
+			$this->context->controller->addJs(_PS_MODULE_DIR_ . $this->name . 'views/js/oneallsociallogin.js');
 
 			//Read library
-			$output .= $this->display (__FILE__, 'oneallsociallogin.tpl');
+			$output .= $this->display (__FILE__, 'oasl_library.tpl');
 		}
 		return $output;
 	}

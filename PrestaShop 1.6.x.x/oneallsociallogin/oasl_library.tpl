@@ -55,7 +55,7 @@
 {/if}
 
 
-{if {$oasl_widget_location} eq 'customer_account_form'}
+{if {$oasl_widget_location} eq 'top'}
 	<div class="block oneall_social_login_block" id="oneall_social_login_block_left">
 	{if {$oasl_translated_title|strip} neq ' '}
 		<p class="title_block">{$oasl_translated_title}</p>

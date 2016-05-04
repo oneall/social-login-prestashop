@@ -22,12 +22,12 @@
 *
 *}
 
-{capture name=path}{l s='Create an account'}{/capture}
+{capture name=path}{l s='Create an account' mod='oneallsociallogin'}{/capture}
 
-<h1 class="page-heading bottom-indent">{l s='You have connected with %s !' sprintf=$identity_provider}</h1>
+<h1 class="page-heading bottom-indent">{l s='You have connected with %s!' sprintf=$identity_provider mod='oneallsociallogin'}</h1>
 <p>
-	{l s='Please take a minute to review and complete your account information.'}
-	{l s='Once you have reviewed your details, your account is ready to use and you can sign in with %s.' sprintf=$identity_provider}
+	{l s='Please take a minute to review and complete your account information.' mod='oneallsociallogin'}
+	{l s='Once you have reviewed your details, your account is ready to use and you can sign in with %s.' sprintf=$identity_provider mod='oneallsociallogin'}
 </p>
 
 {include file="$tpl_dir./errors.tpl"}
@@ -37,27 +37,27 @@
 		<fieldset>
 			<div class="form_content clearfix">
 				<div class="form-group">
-						<label for="oasl_firstname">{l s='First name'} <sup>*</sup></label> 
+						<label for="oasl_firstname">{l s='First name' mod='oneallsociallogin'} <sup>*</sup></label> 
 						<input type="text" class="is_required form-control" id="oasl_firstname" name="oasl_firstname" value="{if isset($smarty.post.oasl_firstname)}{$smarty.post.oasl_firstname|stripslashes}{elseif $oasl_populate == '1'}{$oasl_first_name}{/if}" />
 				</div>
 				<div class="form-group">					
-						<label for="oasl_lastname">{l s='Last name'} <sup>*</sup></label>
+						<label for="oasl_lastname">{l s='Last name' mod='oneallsociallogin'} <sup>*</sup></label>
 						<input type="text" class="is_required form-control" id="oasl_lastname" name="oasl_lastname" value="{if isset($smarty.post.oasl_lastname)}{$smarty.post.oasl_lastname|stripslashes}{elseif $oasl_populate == '1'}{$oasl_last_name}{/if}" />
 				</div>
 				<div class="form-group">				
-						<label for="oasl_email">{l s='Email'} <sup>*</sup></label>
+						<label for="oasl_email">{l s='Email' mod='oneallsociallogin'} <sup>*</sup></label>
 						<input type="text" class="is_required form-control" id="oasl_email" name="oasl_email" value="{if isset($smarty.post.oasl_email)}{$smarty.post.oasl_email|stripslashes}{elseif $oasl_populate == '1'}{$oasl_email}{/if}" />
 				</div>				
 				<div class="checkbox">
 					<label for="oasl_newsletter">
 						<input type="checkbox" id="oasl_newsletter" name="oasl_newsletter" value="1" {if isset($smarty.post.oasl_newsletter) && $smarty.post.oasl_newsletter == '1'}checked="checked"{elseif isset($oasl_newsletter) && $oasl_newsletter == '1'}checked="checked"{/if} />
-						{l s='Sign up for our newsletter!'}
+						{l s='Sign up for our newsletter!' mod='oneallsociallogin'}
 					</label>
 				</div>			
 				<hr />
 				<div class="submit">
 					{if isset($back)}<input type="hidden" class="hidden" name="back" value="{$back|escape:'htmlall':'UTF-8'}" />{/if}
-					<button name="submit" id="submit" type="submit" class="btn btn-default button button-medium"><span>{l s='Confirm'}<i class="icon-chevron-right right"></i></span></button>
+					<button name="submit" id="submit" type="submit" class="btn btn-default button button-medium"><span>{l s='Confirm' mod='oneallsociallogin'}<i class="icon-chevron-right right"></i></span></button>
 				</div>
 			</div>
 		</fieldset>

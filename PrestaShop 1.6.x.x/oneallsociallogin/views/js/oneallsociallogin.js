@@ -1,4 +1,4 @@
-function oneallsociallogin(_oneall, providers, auth_disable, auth_title, custom_title, custom_css) {
+function oneallsociallogin(_oneall, providers, auth_disable, custom_title, custom_css) {
 
 	var containers = [];
 	var elementref = '';
@@ -6,7 +6,6 @@ function oneallsociallogin(_oneall, providers, auth_disable, auth_title, custom_
 
 	providers = (typeof providers !== 'undefined' ? providers : []);
 	auth_disable = (typeof auth_disable !== 'undefined' ? auth_disable : 0);
-	auth_title = (typeof auth_title !== 'undefined' ? auth_title : '');
 	custom_title = (typeof custom_title !== 'undefined' ? custom_title : '');
 	custom_css = (typeof custom_css !== 'undefined' ? custom_css : '');
 
@@ -15,8 +14,8 @@ function oneallsociallogin(_oneall, providers, auth_disable, auth_title, custom_
 			elementref = 'oneall_social_login_providers_' + (10000 + Math.floor(Math.random() * 99999 + 1));
 			containers.push(elementref);
 			contents = '<div class="box oneall_social_login_auth">';
-			if (auth_title.length > 0) {
-				contents += '<h3 class="page-subheading">' + auth_title + '</h3>';
+			if (custom_title.length > 0) {
+				contents += '<h3 class="page-subheading">' + custom_title + '</h3>';
 			}
 			contents += '<div class="oneall_social_login_providers" id="' + elementref + '" /></div>';
 			$(contents).insertAfter(".page-heading:eq(0)");
