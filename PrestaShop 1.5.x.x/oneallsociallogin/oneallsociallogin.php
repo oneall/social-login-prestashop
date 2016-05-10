@@ -37,7 +37,7 @@ class OneallSocialLogin extends Module
 	{
 		$this->name = 'oneallsociallogin';
 		$this->tab = 'administration';
-		$this->version = '1.2';
+		$this->version = '1.3';
 		$this->author = 'OneAll LLC';
 		$this->need_instance = 0;
 		$this->module_key = '2571f9dab09af193a8ca375a09133873';
@@ -59,9 +59,7 @@ class OneallSocialLogin extends Module
 			Configuration::updateValue ('OASL_PROVIDERS', 'facebook,twitter,google,linkedin');
 			Configuration::updateValue ('OASL_LINK_ACCOUNT_DISABLE', 0);
 			Configuration::updateValue ('OASL_HOOK_LEFT_DISABLE', 1);
-			Configuration::updateValue ('OASL_HOOK_LEFT_TITLE', $this->l ('Connect with:'));
 			Configuration::updateValue ('OASL_HOOK_RIGHT_DISABLE', 0);
-			Configuration::updateValue ('OASL_HOOK_RIGHT_TITLE', $this->l ('Connect with:'));
 			Configuration::updateValue ('OASL_DATA_HANDLING', 'verify');
 			Configuration::updateValue ('OASL_EMAIL_CUSTOMER_DISABLE', '0');
 			Configuration::updateValue ('OASL_EMAIL_ADMIN_DISABLE', '0');
@@ -139,11 +137,9 @@ class OneallSocialLogin extends Module
 
 			// Hook Left
 			$hook_left_disable = (Tools::getValue ('OASL_HOOK_LEFT_DISABLE') == 1 ? 1 : 0);
-			$hook_left_title = trim (Tools::getValue ('OASL_HOOK_LEFT_TITLE'));
 
 			// Hook Right
 			$hook_right_disable = (Tools::getValue ('OASL_HOOK_RIGHT_DISABLE') == 1 ? 1 : 0);
-			$hook_right_title = trim (Tools::getValue ('OASL_HOOK_RIGHT_TITLE'));
 
 			// Settings
 			$link_account_disable = (Tools::getValue ('OASL_LINK_ACCOUNT_DISABLE') == 1 ? 1 : 0);
@@ -160,9 +156,7 @@ class OneallSocialLogin extends Module
 			Configuration::updateValue ('OASL_API_PORT', $api_port);
 			Configuration::updateValue ('OASL_PROVIDERS', implode (',', $use_provider_keys));
 			Configuration::updateValue ('OASL_HOOK_LEFT_DISABLE', $hook_left_disable);
-			Configuration::updateValue ('OASL_HOOK_LEFT_TITLE', $hook_left_title);
 			Configuration::updateValue ('OASL_HOOK_RIGHT_DISABLE', $hook_right_disable);
-			Configuration::updateValue ('OASL_HOOK_RIGHT_TITLE', $hook_right_title);
 			Configuration::updateValue ('OASL_LINK_ACCOUNT_DISABLE', $link_account_disable);
 			Configuration::updateValue ('OASL_DATA_HANDLING', $data_handling);
 			Configuration::updateValue ('OASL_EMAIL_ADMIN_DISABLE', $email_admin_disable);
@@ -182,11 +176,9 @@ class OneallSocialLogin extends Module
 
 		// Hook Left
 		$hook_left_disable = Configuration::get ('OASL_HOOK_LEFT_DISABLE') == 1 ? 1 : 0;
-		$hook_left_title = Configuration::get ('OASL_HOOK_LEFT_TITLE');
 
 		// Hook Right
 		$hook_right_disable = Configuration::get ('OASL_HOOK_RIGHT_DISABLE') == 1 ? 1 : 0;
-		$hook_right_title = Configuration::get ('OASL_HOOK_RIGHT_TITLE');
 
 		// Settings
 		$link_account_disable = Configuration::get ('OASL_LINK_ACCOUNT_DISABLE') == 1 ? 1 : 0;
@@ -272,32 +264,21 @@ class OneallSocialLogin extends Module
 			</fieldset>
 
 			<fieldset style="margin-top:20px">
-				<legend>' . $this->l ('Hook: Left Side') . '</legend>
-				<div class="oasl_notice">' . $this->l ('Displays Social Login on the left side of your shop') . '</div>
+				<legend>' . $this->l ('Hooks') . '</legend>
+
+				<div class="oasl_notice">' . $this->l ('Displays Social Login on the left and/or right side of your shop. ') .
+				$this->l ('You can edit the Social Login caption through the Translation tool.') . '</div>
+
 				<label>' . $this->l ('Enable Left Side Hook?') . '</label>
 				<div class="margin-form" style="margin-bottom: 20px;">
 					<input type="radio" name="OASL_HOOK_LEFT_DISABLE" id="OASL_HOOK_LEFT_DISABLE_0" value="0" ' . ($hook_left_disable != 1 ? 'checked="checked"' : '') . ' /> ' . $this->l ('Enable') . '&nbsp;
 					<input type="radio" name="OASL_HOOK_LEFT_DISABLE" id="OASL_HOOK_LEFT_DISABLE_1" value="1" ' . ($hook_left_disable == 1 ? 'checked="checked"' : '') . ' /> ' . $this->l ('Disable') . '<br />
 				</div>
-				<label>' . $this->l ('Left Side Caption') . ':</label>
-				<div class="margin-form">
-					<input type="text" name="OASL_HOOK_LEFT_TITLE" id="OASL_HOOK_LEFT_TITLE" size="60" value="' . htmlspecialchars ($hook_left_title) . '" />
-					<p>	' . $this->l ('Leave empty for none.') . '</p>
-				</div>
-			</fieldset>
 
-			<fieldset style="margin-top:20px">
-				<legend>' . $this->l ('Hook: Right Side') . '</legend>
-				<div class="oasl_notice">' . $this->l ('Displays Social Login on the right side of your shop') . '</div>
 				<label>' . $this->l ('Enable Right Side Hook?') . '</label>
 				<div class="margin-form" style="margin-bottom: 20px;">
 					<input type="radio" name="OASL_HOOK_RIGHT_DISABLE" id="OASL_HOOK_RIGHT_DISABLE_0" value="0" ' . ($hook_right_disable != 1 ? 'checked="checked"' : '') . ' /> ' . $this->l ('Enable') . '&nbsp;
 					<input type="radio" name="OASL_HOOK_RIGHT_DISABLE" id="OASL_HOOK_RIGHT_DISABLE_1" value="1" ' . ($hook_right_disable == 1 ? 'checked="checked"' : '') . ' /> ' . $this->l ('Disable') . '<br />
-				</div>
-				<label>' . $this->l ('Right Side Caption') . ':</label>
-				<div class="margin-form">
-					<input type="text" name="OASL_HOOK_RIGHT_TITLE" id="OASL_HOOK_RIGHT_TITLE" size="60" value="' . htmlspecialchars ($hook_right_title) . '" />
-					<p>' . $this->l ('Leave empty for none.') . '</p>
 				</div>
 			</fieldset>
 
@@ -536,14 +517,6 @@ class OneallSocialLogin extends Module
 			return false;
 		}
 
-		// Drop user_token table
-		$query = 'DROP table IF EXISTS `' . _DB_PREFIX_ . 'oasl_user`';
-		Db::getInstance ()->execute ($query);
-
-		// Drop identity_token table
-		$query = 'DROP table IF EXISTS `' . _DB_PREFIX_ . 'oasl_identity`';
-		Db::getInstance ()->execute ($query);
-
 		// Remove controller files.
 		$files = $this->get_files_to_install ();
 		foreach ($files as $file_name => $file_data)
@@ -580,7 +553,6 @@ class OneallSocialLogin extends Module
 			// Default
 			$widget_enable = false;
 			$widget_location = 'unspecified';
-			$widget_title = '';
 
 			// Check what has to be done
 			switch ($target)
@@ -591,7 +563,6 @@ class OneallSocialLogin extends Module
 					{
 						$widget_enable = true;
 						$widget_location = 'left';
-						$widget_title = Configuration::get ('OASL_HOOK_LEFT_TITLE');
 					}
 					break;
 
@@ -601,7 +572,6 @@ class OneallSocialLogin extends Module
 					{
 						$widget_enable = true;
 						$widget_location = 'right';
-						$widget_title = Configuration::get ('OASL_HOOK_RIGHT_TITLE');
 					}
 					break;
 
@@ -609,7 +579,6 @@ class OneallSocialLogin extends Module
 				case 'custom':
 					$widget_enable = true;
 					$widget_location = 'custom';
-					$widget_title = '';
 					break;
 			}
 
@@ -621,7 +590,6 @@ class OneallSocialLogin extends Module
 				if (is_array ($providers) and count ($providers) > 0)
 				{
 					// Setup placeholders
-					$smarty->assign ('oasl_widget_title', $widget_title);
 					$smarty->assign ('oasl_widget_location', $widget_location);
 					$smarty->assign ('oasl_widget_rnd', mt_rand (99999, 9999999));
 					$smarty->assign ('oasl_widget_css', '');

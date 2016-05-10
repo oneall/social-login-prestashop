@@ -28,7 +28,7 @@
 class oneall_social_login_tools
 {
 	
-	const USER_AGENT = 'SocialLogin/1.2 PrestaShop/1.5.x.x (+http://www.oneall.com/)';
+	const USER_AGENT = 'SocialLogin/1.3 PrestaShop/1.5.x.x (+http://www.oneall.com/)';
 	
 	/**
 	 * Logs a given customer in.

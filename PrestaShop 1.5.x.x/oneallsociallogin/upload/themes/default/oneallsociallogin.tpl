@@ -22,38 +22,38 @@
 *
 *}
 
-{capture name=path}{l s='Create an account'}{/capture}
+{capture name=path}{l s='Create an account' mod='oneallsociallogin'}{/capture}
 {include file="$tpl_dir./breadcrumb.tpl"}
 
-<h1>{l s='You have connected with %s !' sprintf=$identity_provider}</h1>
+<h1>{l s='You have connected with %s !' sprintf=$identity_provider mod='oneallsociallogin'}</h1>
 <p>
-	{l s='Please take a minute to review and complete your account information.'}
-	{l s='Once you have reviewed your details, your account is ready to use and you can sign in with %s.' sprintf=$identity_provider}
+	{l s='Please take a minute to review and complete your account information.' mod='oneallsociallogin'}
+	{l s='Once you have reviewed your details, your account is ready to use and you can sign in with %s.' sprintf=$identity_provider mod='oneallsociallogin'}
 </p>
 
 
 {include file="$tpl_dir./errors.tpl"}
 
 <div id="oneallsociallogin">
-	<p class="required"><sup>*</sup>{l s='Required field'}</p>
+	<p class="required"><sup>*</sup>{l s='Required field' mod='oneallsociallogin'}</p>
 	<form action="{$link->getPageLink('oneallsociallogin', true)}" method="post" class="std">
 		<fieldset>
 			<div class="form_content clearfix">
 				<p class="required text">
-					<label for="firstname">{l s='First name'} <sup>*</sup></label>
+					<label for="firstname">{l s='First name' mod='oneallsociallogin'} <sup>*</sup></label>
 					 <span><input type="text" id="oasl_firstname" name="oasl_firstname" value="{if isset($smarty.post.oasl_firstname)}{$smarty.post.oasl_firstname|stripslashes}{elseif $oasl_populate == '1'}{$oasl_first_name}{/if}" /></span>
 				</p>
 				<p class="required text">
-					<label for="email">{l s='Last name'} <sup>*</sup></label>
+					<label for="email">{l s='Last name' mod='oneallsociallogin'} <sup>*</sup></label>
 					<span><input type="text" id="oasl_lastname" name="oasl_lastname" value="{if isset($smarty.post.oasl_lastname)}{$smarty.post.oasl_lastname|stripslashes}{elseif $oasl_populate == '1'}{$oasl_last_name}{/if}" /></span>
 				</p>
 				<p class="required text">
-					<label for="email">{l s='Email'} <sup>*</sup></label>
+					<label for="email">{l s='Email' mod='oneallsociallogin'} <sup>*</sup></label>
 					<span><input type="text" id="oasl_email" name="oasl_email" value="{if isset($smarty.post.oasl_email)}{$smarty.post.oasl_email|stripslashes}{elseif $oasl_populate == '1'}{$oasl_email}{/if}" /></span>	
 				</p>
 				<p class="submit">
 					{if isset($back)}<input type="hidden" class="hidden" name="back" value="{$back|escape:'htmlall':'UTF-8'}" />{/if}
-					<input type="submit" id="submit" name="submit" class="button" value="{l s='Confirm'}" />
+					<input type="submit" id="submit" name="submit" class="button" value="{l s='Confirm' mod='oneallsociallogin'}" />
 				</p>
 			</div>
 		</fieldset>
