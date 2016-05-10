@@ -334,19 +334,15 @@ class oneall_social_login_tools
 		$mail_vars['{email}'] = $customer->email;
 
 		//Read the first employe - should be the board owner
-		$sql = "SELECT `firstname`, `lastname`, `email` FROM `" . _DB_PREFIX_ . "employee` ORDER BY id_profile ASC LIMIT 1";
-		$employees = Db::getInstance ()->ExecuteS ($sql);
-		if (is_array ($employees) AND count ($employees) > 0)
+		$employees = Employee::getEmployeesByProfile(_PS_ADMIN_PROFILE_, true);
+		foreach ($employees as $employee)
 		{
-			foreach ($employees as $employee)
-			{
-				//Employee Details
-				$mail_vars['{firstname}'] = $employee['firstname'];
-				$mail_vars['{lastname}'] = $employee['lastname'];
+			//Employee Details
+			$mail_vars['{firstname}'] = $employee['firstname'];
+			$mail_vars['{lastname}'] = $employee['lastname'];
 
-				//Send Mail
-				@Mail::Send ($language_id, 'contact', $mail_title ,$mail_vars, $employee['email'], $employee['firstname'].' '.$employee['lastname']);
-			}
+			//Send Mail
+			@Mail::Send ($language_id, 'contact', $mail_title ,$mail_vars, $employee['email'], $employee['firstname'].' '.$employee['lastname']);
 		}
 
 		//Done
