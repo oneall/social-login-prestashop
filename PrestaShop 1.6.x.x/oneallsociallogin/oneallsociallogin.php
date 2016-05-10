@@ -470,11 +470,11 @@ class OneallSocialLogin extends Module
 	{
 		return array (
 			// Widget
-			'leftColumn' => array (
+			'displayLeftColumn' => array (
 				'pos' => 1
 			),
 			// Widget
-			'rightColumn' => array (
+			'displayRightColumn' => array (
 				'pos' => 1
 			),
 			//Create account
@@ -486,9 +486,9 @@ class OneallSocialLogin extends Module
 				'pos' => 1
 			),
 			// Callback
-			'top' => array (),
+			'displayTop' => array (),
 			//Library
-			'header' => array ()
+			'displayHeader' => array ()
 		);
 	}
 
@@ -647,7 +647,7 @@ class OneallSocialLogin extends Module
 					if (Configuration::get ('OASL_JS_HOOK_AUTH_DISABLE') <> 1)
 					{
 						$widget_enable = true;
-						$widget_location = 'top';
+						$widget_location = $target;
 					}
 					break;
 
@@ -656,7 +656,7 @@ class OneallSocialLogin extends Module
 					if (Configuration::get ('OASL_HOOK_LEFT_DISABLE') <> 1)
 					{
 						$widget_enable = true;
-						$widget_location = 'left';
+						$widget_location = $target;
 					}
 					break;
 
@@ -665,13 +665,13 @@ class OneallSocialLogin extends Module
 					if (Configuration::get ('OASL_HOOK_RIGHT_DISABLE') <> 1)
 					{
 						$widget_enable = true;
-						$widget_location = 'right';
+						$widget_location = $target;
 					}
 					break;
 
 				case 'custom':
 					$widget_enable = true;
-					$widget_location = 'custom';
+					$widget_location = $target;
 					break;
 			}
 
@@ -689,7 +689,7 @@ class OneallSocialLogin extends Module
 					$smarty->assign ('oasl_widget_providers', '"' . implode ('","', $providers) . '"');
 
 					//Display template
-					return $this->display (__FILE__, 'oasl_library.tpl');
+					return $this->display (__FILE__, 'oneallicons.tpl');
 				}
 			}
 		}
@@ -717,7 +717,7 @@ class OneallSocialLogin extends Module
 	/**
 	 * Hook: Left Column
 	 **/
-	public function hookLeftColumn ($params)
+	public function hookDisplayLeftColumn ($params)
 	{
 		return $this->hookGeneric ($params, 'left_column');
 	}
@@ -726,7 +726,7 @@ class OneallSocialLogin extends Module
 	/**
 	 * Hook: Right Column
 	 **/
-	public function hookRightColumn ($params)
+	public function hookDisplayRightColumn ($params)
 	{
 		return $this->hookGeneric ($params, 'right_column');
 	}
@@ -735,7 +735,7 @@ class OneallSocialLogin extends Module
 	/**
 	 * Hook: Header (Library)
 	 **/
-	public function hookHeader ($params)
+	public function hookDisplayHeader ($params)
 	{
 		//Output
 		$output = '';
@@ -770,10 +770,10 @@ class OneallSocialLogin extends Module
 			}
 
 			//Add Our JavaScript
-			$this->context->controller->addJs(_PS_MODULE_DIR_ . $this->name . 'views/js/oneallsociallogin.js');
+			$this->context->controller->addJs($this->_path.'views/js/'.$this->name.'.js');
 
 			//Read library
-			$output .= $this->display (__FILE__, 'oasl_library.tpl');
+			$output .= $this->display (__FILE__, 'oneallicons.tpl');
 		}
 		return $output;
 	}
@@ -782,7 +782,7 @@ class OneallSocialLogin extends Module
 	/**
 	 * Hook: Page Top (Callback)
 	 **/
-	public function hookTop ()
+	public function hookDisplayTop ()
 	{
 		// Load the context.
 		$this->context = Context::getContext ();

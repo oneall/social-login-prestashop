@@ -73,7 +73,7 @@
 	</div>
 {/if}
 
-{if {$oasl_widget_location} eq 'left'}
+{if {$oasl_widget_location} eq 'left_column'}
 	<div class="block oneall_social_login_block" id="oneall_social_login_block_left">
 	{if {$oasl_translated_title|strip} neq ' '}
 		<p class="title_block">{$oasl_translated_title}</p>
@@ -91,7 +91,7 @@
 	</div>
 {/if}
 
-{if {$oasl_widget_location} eq 'right'}
+{if {$oasl_widget_location} eq 'right_column'}
 	<div class="block oneall_social_login_block" id="oneall_social_login_block_right">
 	{if {$oasl_translated_title|strip} neq ' '}
 		<p class="title_block">{$oasl_translated_title}</p>
