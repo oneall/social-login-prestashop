@@ -873,7 +873,10 @@ class OneallSocialLogin extends Module
 							$customer_email_notify = true;
 
 							// Redirection url.
-							$redirect_to = $this->context->link->getPageLink ('oneallsociallogin', true, null, array ('back' => oneall_social_login_tools::get_current_url ()));
+							$redirect_to = $this->context->link->getModuleLink (
+									$this->name, 
+									'register', 
+									array ('back' => oneall_social_login_tools::get_current_url ()));
 
 							// How do we have to proceed?
 							switch (Configuration::get ('OASL_DATA_HANDLING'))

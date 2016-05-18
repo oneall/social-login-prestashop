@@ -22,12 +22,12 @@
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
  */
-class OneAllSocialLoginModuleFrontController extends ModuleFrontController
+class OneAllSocialLoginRegisterModuleFrontController extends ModuleFrontController
 {
 	public $auth = false;
-	public $php_self = 'oneallsociallogin';
-	public $authRedirection = 'oneallsociallogin';
-	public $ssl = false;
+	//public $authRedirection = 'oneallsociallogin';  // commented because $auth === false
+	public $ssl = true;
+	//public $php_self = 'oneallsociallogin';  // this causes a redirection
 
 	/**
 	 * Assign template vars related to page content
@@ -108,7 +108,7 @@ class OneAllSocialLoginModuleFrontController extends ModuleFrontController
 					{
 						$this->errors [] = Tools::displayError ('This email address is already taken');
 					}
-
+					
 					// We are good to go.
 					if (count ($this->errors) == 0)
 					{
@@ -125,6 +125,8 @@ class OneAllSocialLoginModuleFrontController extends ModuleFrontController
 						// Create a new account.
 						$id_customer = oneall_social_login_tools::create_customer_from_data ($data, $send_email_to_admin, $send_email_to_customer);
 
+						var_dump ('id customer= '. $id_customer); die;
+						
 						// Login the customer.
 						if (!empty ($id_customer) AND oneall_social_login_tools::login_customer ($id_customer))
 						{
