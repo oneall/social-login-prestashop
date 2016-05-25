@@ -432,7 +432,7 @@ class OneallSocialLogin extends Module
 			<script type="text/javascript">
 				<!--
 					var OASL_AJAX_TOKEN = \'' . sha1 (_COOKIE_KEY_ . 'ONEALLSOCIALLOGIN') . '\';
-					var OASL_AJAX_PATH  = \'' . Tools::getShopDomain (true, true) . __PS_BASE_URI__ . 'modules/oneallsociallogin/assets/ajax/admin.php\';
+					var OASL_AJAX_PATH  = \'' . Tools::getShopDomainSsl (true, true) . __PS_BASE_URI__ . 'modules/oneallsociallogin/assets/ajax/admin.php\';
 				//-->
 			</script>
 		</form>';
