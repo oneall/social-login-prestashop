@@ -440,18 +440,6 @@ class OneallSocialLogin extends Module
 	protected function get_files_to_install ()
 	{
 		return array (
-			/*'OneAllSocialLoginController.php' => array (
-				'source' => _PS_MODULE_DIR_ . $this->name . '/upload/controllers/front/',
-				'target' => _PS_ROOT_DIR_ . '/controllers/front/'
-			),
-			'oneallsociallogin.tpl' => array (
-				'source' => _PS_MODULE_DIR_ . $this->name . '/upload/themes/default/',
-				'target' => _PS_THEME_DIR_
-			),
-			'oneallsociallogin.js' => array (
-				'source' => _PS_MODULE_DIR_ . $this->name . '/upload/js/',
-				'target' => _PS_ROOT_DIR_ . '/js/'
-			),*/
 			'oneallsociallogin_account.html' => array (
 				'source' => _PS_MODULE_DIR_ . $this->name . '/upload/mails/en/',
 				'target' => _PS_MAIL_DIR_ . 'en/'

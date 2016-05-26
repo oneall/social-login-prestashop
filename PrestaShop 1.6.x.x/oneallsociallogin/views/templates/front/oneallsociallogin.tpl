@@ -33,7 +33,7 @@
 {include file="$tpl_dir./errors.tpl"}
 
 <div id="oneallsociallogin">
-	<form id="account-creation_form" action="{$link->getPageLink('oneallsociallogin', true)}" method="post" class="box">
+	<form id="account-creation_form" action="{$oasl_register}" method="post" class="box">
 		<fieldset>
 			<div class="form_content clearfix">
 				<div class="form-group">

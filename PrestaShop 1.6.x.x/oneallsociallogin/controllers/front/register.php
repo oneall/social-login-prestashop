@@ -125,8 +125,6 @@ class OneAllSocialLoginRegisterModuleFrontController extends ModuleFrontControll
 						// Create a new account.
 						$id_customer = oneall_social_login_tools::create_customer_from_data ($data, $send_email_to_admin, $send_email_to_customer);
 
-						var_dump ('id customer= '. $id_customer); die;
-						
 						// Login the customer.
 						if (!empty ($id_customer) AND oneall_social_login_tools::login_customer ($id_customer))
 						{
@@ -152,7 +150,8 @@ class OneAllSocialLoginRegisterModuleFrontController extends ModuleFrontControll
 
 				// Assign template vars.
 				$smarty->assign ('identity_provider', $data ['identity_provider']);
-
+				$smarty->assign ('oasl_register', $this->context->link->getModuleLink ('oneallsociallogin','register')); 
+				
 				// Show our template.
 				$this->setTemplate ('oneallsociallogin.tpl');
 			}
