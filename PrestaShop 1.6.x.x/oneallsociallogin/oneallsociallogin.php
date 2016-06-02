@@ -739,9 +739,6 @@ class OneallSocialLogin extends Module
 			// Add a shortcut.
 			$smarty->assign ('HOOK_OASL_CUSTOM', $this->hookGeneric ($params, 'custom'));
 
-			//JavaScript embedding.
-			$this->hookGeneric ($params, 'embedder');
-
 			// Add the OneAll Social Library.
 			$smarty->assign ('oasl_widget_location', 'library');
 
