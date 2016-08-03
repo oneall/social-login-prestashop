@@ -22,12 +22,12 @@
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
  */
-class OneAllSocialLoginController extends FrontController
+class OneAllSocialLoginRegisterModuleFrontController extends ModuleFrontController
 {
 	public $auth = false;
-	public $php_self = 'oneallsociallogin';
-	public $authRedirection = 'oneallsociallogin';
-	public $ssl = false;
+	//public $authRedirection = 'oneallsociallogin';  // commented because $auth === false
+	public $ssl = true;
+	//public $php_self = 'oneallsociallogin';  // this causes a redirection
 
 	/**
 	 * Assign template vars related to page content
@@ -108,7 +108,7 @@ class OneAllSocialLoginController extends FrontController
 					{
 						$this->errors [] = Tools::displayError ('This email address is already taken');
 					}
-
+					
 					// We are good to go.
 					if (count ($this->errors) == 0)
 					{
@@ -150,9 +150,10 @@ class OneAllSocialLoginController extends FrontController
 
 				// Assign template vars.
 				$smarty->assign ('identity_provider', $data ['identity_provider']);
-
+				$smarty->assign ('oasl_register', $this->context->link->getModuleLink ('oneallsociallogin','register')); 
+				
 				// Show our template.
-				$this->setTemplate (_PS_THEME_DIR_ . 'oneallsociallogin.tpl');
+				$this->setTemplate ('oneallsociallogin.tpl');
 			}
 		}
 

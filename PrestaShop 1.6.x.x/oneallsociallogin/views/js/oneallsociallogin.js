@@ -1,25 +1,33 @@
-function oneallsociallogin(_oneall, providers, auth_disable, auth_title, custom_title, custom_css) {
+function oneallsociallogin(_oneall, providers, auth_disable, custom_title, custom_css) {
 
+	var has_logger = !!(window.console && window.console.log);
 	var containers = [];
 	var elementref = '';
 	var contents = '';
 
 	providers = (typeof providers !== 'undefined' ? providers : []);
 	auth_disable = (typeof auth_disable !== 'undefined' ? auth_disable : 0);
-	auth_title = (typeof auth_title !== 'undefined' ? auth_title : '');
 	custom_title = (typeof custom_title !== 'undefined' ? custom_title : '');
 	custom_css = (typeof custom_css !== 'undefined' ? custom_css : '');
+
 
 	if (auth_disable != 1) {
 		if ($("body#authentication").length > 0) {
 			elementref = 'oneall_social_login_providers_' + (10000 + Math.floor(Math.random() * 99999 + 1));
 			containers.push(elementref);
 			contents = '<div class="box oneall_social_login_auth">';
-			if (auth_title.length > 0) {
-				contents += '<h3 class="page-subheading">' + auth_title + '</h3>';
+			if (custom_title.length > 0) {
+				contents += '<h3 class="page-subheading">' + custom_title + '</h3>';
 			}
 			contents += '<div class="oneall_social_login_providers" id="' + elementref + '" /></div>';
-			$(contents).insertAfter(".page-heading:eq(0)");
+			var inserted = $(contents).insertAfter(".page-heading:eq(0)");
+			/* Try another location (i.e. transformer theme). */
+			if (inserted.length == 0) {
+				inserted = $(contents).insertAfter(".heading:eq(0)");
+			}
+			if (has_logger && inserted.length == 0) {
+				console.log("Error: (OneAll) could not find the element to add the social icons to.");
+			}
 		}
 	}
 

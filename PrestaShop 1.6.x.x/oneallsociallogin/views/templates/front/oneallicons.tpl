@@ -22,6 +22,9 @@
 *
 *}
  
+{capture name='oneallsociallogin_title'}{l s='Connect with:' mod='oneallsociallogin'}{/capture}
+{assign var='oasl_translated_title' value=$smarty.capture.oneallsociallogin_title}
+
 {if {$oasl_widget_location} eq 'library'}
 	<script type="text/javascript">
     
@@ -39,7 +42,11 @@
 		var _oneall = _oneall || [];                
 		$(document).ready(function() {  
 			if (typeof oneallsociallogin !== 'undefined') {
-				oneallsociallogin (_oneall, [{$oasl_widget_providers}], '{$oasl_auth_disable}', '{$oasl_auth_title}', '{$oasl_custom_title}');
+				{if {$oasl_translated_title|strip} neq ' '}
+				oneallsociallogin (_oneall, [{$oasl_widget_providers}], '{$oasl_auth_disable}', '{$oasl_translated_title}');
+				{else}
+				oneallsociallogin (_oneall, [{$oasl_widget_providers}], '{$oasl_auth_disable}');
+				{/if}
 			} else {
 				throw new Error("OneAll Social Login is not correctly installed, the required file oneallsocialogin.js is not included.");
 			}
@@ -50,9 +57,9 @@
 
 {if {$oasl_widget_location} eq 'customer_account_form'}
 	<div class="block oneall_social_login_block" id="oneall_social_login_block_left">
-		{if {$oasl_widget_title} neq ''}
-			<p class="title_block">{$oasl_widget_title}</p>
-		{/if}
+	{if {$oasl_translated_title|strip} neq ' '}
+		<p class="title_block">{$oasl_translated_title}</p>
+	{/if}
 		<p class="block_content">
 			<div class="oneall_social_login_providers" id="oneall_social_login_providers_{$oasl_widget_rnd}"></div>
 			<script type="text/javascript">
@@ -66,11 +73,11 @@
 	</div>
 {/if}
 
-{if {$oasl_widget_location} eq 'left'}
+{if {$oasl_widget_location} eq 'left_column'}
 	<div class="block oneall_social_login_block" id="oneall_social_login_block_left">
-		{if {$oasl_widget_title} neq ''}
-			<p class="title_block">{$oasl_widget_title}</p>
-		{/if}
+	{if {$oasl_translated_title|strip} neq ' '}
+		<p class="title_block">{$oasl_translated_title}</p>
+	{/if}
 		<p class="block_content">
 			<div class="oneall_social_login_providers" id="oneall_social_login_providers_{$oasl_widget_rnd}"></div>
 			<script type="text/javascript">
@@ -84,11 +91,11 @@
 	</div>
 {/if}
 
-{if {$oasl_widget_location} eq 'right'}
+{if {$oasl_widget_location} eq 'right_column'}
 	<div class="block oneall_social_login_block" id="oneall_social_login_block_right">
-		{if {$oasl_widget_title} neq ''}
-			<p class="title_block">{$oasl_widget_title}</p>
-		{/if}
+	{if {$oasl_translated_title|strip} neq ' '}
+		<p class="title_block">{$oasl_translated_title}</p>
+	{/if}
 		<p class="block_content">
 			<div class="oneall_social_login_providers" id="oneall_social_login_providers_{$oasl_widget_rnd}"></div>
 			<script type="text/javascript">
