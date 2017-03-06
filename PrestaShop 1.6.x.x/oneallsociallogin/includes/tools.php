@@ -1,7 +1,7 @@
 <?php
 /**
  * @package   	OneAll Social Login
- * @copyright 	Copyright 2011-2015 http://www.oneall.com
+ * @copyright 	Copyright 2011-2017 http://www.oneall.com
  * @license   	GNU/GPL 2 or later
  *
  * This program is free software; you can redistribute it and/or
@@ -25,9 +25,8 @@
 
 //OneAll Social Login Toolbox
 class oneall_social_login_tools
-{
-	
-	const USER_AGENT = 'SocialLogin/1.8 PrestaShop/1.6.x.x (+http://www.oneall.com/)';
+{	
+	const USER_AGENT = 'SocialLogin/1.9 PrestaShop/1.6.x.x (+http://www.oneall.com/)';
 	
 	/**
 	* Logs a given customer in.
@@ -61,11 +60,13 @@ class oneall_social_login_tools
 			$context->cookie->customer_lastname = $customer->lastname;
 			$context->cookie->customer_firstname = $customer->firstname;
 			$context->cookie->logged = 1;
-			$customer->logged = 1;
 			$context->cookie->is_guest = $customer->isGuest();
 			$context->cookie->passwd = $customer->passwd;
 			$context->cookie->email = $customer->email;
 
+			// Customer is logged in
+			$customer->logged = 1;
+			
 			// Add customer to the context
 			$context->customer = $customer;
 
@@ -746,7 +747,7 @@ class oneall_social_login_tools
 
 		//Create HTTP request
 		$defaults = array (
-			'Host' => "Host: $host",
+			'Host' => 'Host: '.$host,
 			'User-Agent' => 'User-Agent: ' . self::USER_AGENT
 		);
 

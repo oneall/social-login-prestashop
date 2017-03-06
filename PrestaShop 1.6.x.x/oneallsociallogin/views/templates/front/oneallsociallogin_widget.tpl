@@ -1,6 +1,6 @@
 {*
 * @package   	OneAll Social Login
-* @copyright 	Copyright 2011-2015 http://www.oneall.com
+* @copyright 	Copyright 2011-2017 http://www.oneall.com
 * @license   	GNU/GPL 2 or later
 *
 * This program is free software; you can redistribute it and/or
@@ -56,7 +56,7 @@
 
 
 {if {$oasl_widget_location} eq 'customer_account_form'}
-	<div class="block oneall_social_login_block" id="oneall_social_login_block_left">
+	<div class="block oneall_social_login_block" id="oneall_social_login_block_customer_account_form">
 	{if {$oasl_translated_title|strip} neq ' '}
 		<p class="title_block">{$oasl_translated_title}</p>
 	{/if}
@@ -74,7 +74,7 @@
 {/if}
 
 {if {$oasl_widget_location} eq 'left_column'}
-	<div class="block oneall_social_login_block" id="oneall_social_login_block_left">
+	<div class="block oneall_social_login_block" id="oneall_social_login_block_left_column">
 	{if {$oasl_translated_title|strip} neq ' '}
 		<p class="title_block">{$oasl_translated_title}</p>
 	{/if}
@@ -92,7 +92,7 @@
 {/if}
 
 {if {$oasl_widget_location} eq 'right_column'}
-	<div class="block oneall_social_login_block" id="oneall_social_login_block_right">
+	<div class="block oneall_social_login_block" id="oneall_social_login_block_right_column">
 	{if {$oasl_translated_title|strip} neq ' '}
 		<p class="title_block">{$oasl_translated_title}</p>
 	{/if}

@@ -1,7 +1,7 @@
 <?php
 /**
  * @package   	OneAll Social Login
- * @copyright 	Copyright 2011-2015 http://www.oneall.com
+ * @copyright 	Copyright 2011-2017 http://www.oneall.com
  * @license   	GNU/GPL 2 or later
  *
  * This program is free software; you can redistribute it and/or
@@ -25,9 +25,7 @@
 class OneAllSocialLoginRegisterModuleFrontController extends ModuleFrontController
 {
 	public $auth = false;
-	//public $authRedirection = 'oneallsociallogin';  // commented because $auth === false
 	public $ssl = true;
-	//public $php_self = 'oneallsociallogin';  // this causes a redirection
 
 	/**
 	 * Assign template vars related to page content
@@ -36,41 +34,41 @@ class OneAllSocialLoginRegisterModuleFrontController extends ModuleFrontControll
 	{
 		parent::initContent ();
 		global $smarty;
-
+		
 		// Restore back value.
 		$back = Tools::getValue ('back');
-
+		
 		if (!empty ($back))
 		{
 			$this->context->smarty->assign ('back', Tools::safeOutput ($back));
 		}
-
-		//	Did an error occur?
+		
+		// Did an error occur?
 		$have_error = true;
-
+		
 		// The cookie is required to proceed.
 		if (isset ($this->context->cookie->oasl_data))
 		{
 			// Extract the data.
 			$data = unserialize (base64_decode ($this->context->cookie->oasl_data));
-
+			
 			// Check data format.
 			if (is_array ($data))
 			{
 				$have_error = false;
-
-				//Submit Button Clicked
+				
+				// Submit Button Clicked
 				if (Tools::isSubmit ('submit'))
 				{
 					// Reset Errors.
-					$this->errors = array ();
-
+					$this->errors = array();
+					
 					// Read fields.
 					$email = trim (Tools::getValue ('oasl_email'));
 					$firstname = trim (Tools::getValue ('oasl_firstname'));
 					$lastname = trim (Tools::getValue ('oasl_lastname'));
 					$newsletter = intval (Tools::getValue ('oasl_newsletter'));
-
+					
 					// Make sure the firstname is not empty.
 					if (strlen ($firstname) == 0)
 					{
@@ -81,7 +79,7 @@ class OneAllSocialLoginRegisterModuleFrontController extends ModuleFrontControll
 					{
 						$this->errors [] = Tools::displayError ('Please enter a valid first name');
 					}
-
+					
 					// Make sure the lastname is not empty.
 					if (strlen ($lastname) == 0)
 					{
@@ -92,7 +90,7 @@ class OneAllSocialLoginRegisterModuleFrontController extends ModuleFrontControll
 					{
 						$this->errors [] = Tools::displayError ('Please enter a valid last name');
 					}
-
+					
 					// Make sure the email address it is not empty.
 					if (strlen ($email) == 0)
 					{
@@ -117,21 +115,21 @@ class OneAllSocialLoginRegisterModuleFrontController extends ModuleFrontControll
 						$data ['user_first_name'] = ucwords (strtolower ($firstname));
 						$data ['user_last_name'] = ucwords (strtolower ($lastname));
 						$data ['user_newsletter'] = ($newsletter == 1 ? 1 : 0);
-
+						
 						// Email flags.
-						$send_email_to_admin = ((Configuration::get ('OASL_EMAIL_ADMIN_DISABLE') <> 1) ? true : false);
-						$send_email_to_customer = ((Configuration::get ('OASL_EMAIL_CUSTOMER_DISABLE') <> 1) ? true : false);
-
+						$send_email_to_admin = ((Configuration::get ('OASL_EMAIL_ADMIN_DISABLE') != 1) ? true : false);
+						$send_email_to_customer = ((Configuration::get ('OASL_EMAIL_CUSTOMER_DISABLE') != 1) ? true : false);
+						
 						// Create a new account.
 						$id_customer = oneall_social_login_tools::create_customer_from_data ($data, $send_email_to_admin, $send_email_to_customer);
-
+						
 						// Login the customer.
-						if (!empty ($id_customer) AND oneall_social_login_tools::login_customer ($id_customer))
+						if (!empty ($id_customer) and oneall_social_login_tools::login_customer ($id_customer))
 						{
-							//Remove the data
+							// Remove the data
 							unset ($this->context->cookie->oasl_data);
-
-							//A refresh is required to update the page
+							
+							// A refresh is required to update the page
 							$back = trim (Tools::getValue ('back'));
 							$back = (!empty ($back) ? $back : oneall_social_login_tools::get_current_url ());
 							Tools::redirect ($back);
@@ -147,16 +145,16 @@ class OneAllSocialLoginRegisterModuleFrontController extends ModuleFrontControll
 					$smarty->assign ('oasl_last_name', (isset ($data ['user_last_name']) ? $data ['user_last_name'] : ''));
 					$smarty->assign ('oasl_newsletter', 1);
 				}
-
+				
 				// Assign template vars.
 				$smarty->assign ('identity_provider', $data ['identity_provider']);
-				$smarty->assign ('oasl_register', $this->context->link->getModuleLink ('oneallsociallogin','register')); 
+				$smarty->assign ('oasl_register', $this->context->link->getModuleLink ('oneallsociallogin', 'register'));
 				
 				// Show our template.
-				$this->setTemplate ('oneallsociallogin.tpl');
+				$this->setTemplate ('oneallsociallogin_register.tpl');
 			}
 		}
-
+		
 		// We could not extract the data.
 		if ($have_error)
 		{
