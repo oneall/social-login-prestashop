@@ -25,6 +25,9 @@
 {capture name='oneallsociallogin_title'}{l s='Connect with:' mod='oneallsociallogin'}{/capture}
 {assign var='oasl_translated_title' value=$smarty.capture.oneallsociallogin_title}
 
+{capture name='oneallsociallogin_title_login'}{l s='Log in with:' mod='oneallsociallogin'}{/capture}
+{assign var='oasl_translated_title_login' value=$smarty.capture.oneallsociallogin_title_login}
+
 {if {$oasl_widget_location} eq 'library'}
 	<script type="text/javascript">
     
@@ -57,8 +60,8 @@
 
 {if {$oasl_widget_location} eq 'customer_account_form'}
 	<div class="block oneall_social_login_block" id="oneall_social_login_block_customer_account_form">
-	{if {$oasl_translated_title|strip} neq ' '}
-		<p class="title_block">{$oasl_translated_title}</p>
+	{if {$oasl_translated_title_login|strip} neq ' '}
+		<p class="title_block">{$oasl_translated_title_login}</p>
 	{/if}
 		<p class="block_content">
 			<div class="oneall_social_login_providers" id="oneall_social_login_providers_{$oasl_widget_rnd}"></div>
