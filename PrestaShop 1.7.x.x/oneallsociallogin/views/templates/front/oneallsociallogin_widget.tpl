@@ -34,6 +34,7 @@
 {if {$oasl_widget_location} eq 'library'}
 	<script type="text/javascript">
 
+	  	oasl_translated_title = typeof oasl_translated_title != 'undefined' ? oasl_translated_title : '';
 	  	oasl_widget_location = "{$oasl_widget_location}";
     	oasl_subdomain = "{$oasl_subdomain}";
 	    oasl_auth_disable = '{$oasl_auth_disable}';

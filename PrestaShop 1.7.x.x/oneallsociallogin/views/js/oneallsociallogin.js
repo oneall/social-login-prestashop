@@ -75,17 +75,19 @@ if (oasl_widget_location == 'library'){
 	s.parentNode.insertBefore(oa, s);
 
 
-	/* Custom Hooks */      
-	var _oneall = _oneall || [];                
-	$(document).ready(function() {
-		if (typeof oneallsociallogin !== 'undefined') {
-			if (oasl_translated_title != ' '){
-				oneallsociallogin (_oneall, providers, oasl_auth_disable, oasl_translated_title);
+	if ($('#oneall_social_login').length > 0){
+		/* Custom Hooks */      
+		var _oneall = _oneall || [];                
+		$(document).ready(function() {
+			if (typeof oneallsociallogin !== 'undefined') {
+				if (oasl_translated_title != ' '){
+					oneallsociallogin (_oneall, providers, oasl_auth_disable, oasl_translated_title);
+				} else {
+					oneallsociallogin (_oneall, providers, oasl_auth_disable);
+				}
 			} else {
-				oneallsociallogin (_oneall, providers, oasl_auth_disable);
+				throw new Error("OneAll Social Login is not correctly installed, the required file oneallsocialogin.js is not included.");
 			}
-		} else {
-			throw new Error("OneAll Social Login is not correctly installed, the required file oneallsocialogin.js is not included.");
-		}
-	});  
+		});  
+	}
 }
