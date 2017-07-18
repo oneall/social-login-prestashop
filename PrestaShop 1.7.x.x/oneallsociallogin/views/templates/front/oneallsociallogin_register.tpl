@@ -58,7 +58,6 @@
 				</div>			
 				<hr />
 				<div class="submit">
-					{if isset($back)}<input type="hidden" class="hidden" name="back" value="{$back|escape:'htmlall':'UTF-8'}" />{/if}
 					<button name="submit" id="submit" type="submit" class="btn btn-default button button-medium"><span>{l s='Confirm' mod='oneallsociallogin'}<i class="icon-chevron-right right"></i></span></button>
 				</div>
 			</div>

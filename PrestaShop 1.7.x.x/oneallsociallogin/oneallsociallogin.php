@@ -36,7 +36,7 @@ class OneallSocialLogin extends Module
     {
         $this->name = 'oneallsociallogin';
         $this->tab = 'administration';
-        $this->version = '1.0';
+        $this->version = '1.1';
         $this->author = 'OneAll LLC';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = array(
@@ -293,14 +293,10 @@ class OneallSocialLogin extends Module
 
 			<fieldset style="margin-top:20px">
 				<legend>' . $this->l('Custom Embedding') . '</legend>
-				<div class="oasl_notice">' . $this->l('You can manually embed Social Login by adding one of these codes to a .tpl file of your PrestaShop:') . '</div>
-				<label style="width:300px;text-align:left"><code>&lt;div id=&quot;oneall_social_login&quot;&gt;&lt;/div&gt;</code> </label>
+				<div class="oasl_notice">' . $this->l('You can manually embed Social Login by adding this code to a .tpl file of your PrestaShop:') . '</div>
+				<label style="width:300px;text-align:left"><code>{$HOOK_OASL_CUSTOM nofilter}</code></label>
 				<div style="margin-bottom: 20px;">
-						' . $this->l('Use this code to display the Social Login buttons only') . '
-				</div>
-				<label style="width:300px;text-align:left"><code>&lt;div id=&quot;oneall_social_login_box&quot;&gt;&lt;/div&gt;</code></label>
-				<div style="margin-bottom: 20px;">
-						' . $this->l('Use this code to display the Social Login buttons inside of a box and with a title') . '
+						' . $this->l('Simply copy the code and add it to any .tpl file in your /themes directory.') . '
 				</div>
 			</fieldset>
 
@@ -755,6 +751,7 @@ class OneallSocialLogin extends Module
                     // Setup placeholders
                     $smarty->assign('oasl_widget_location', $widget_location);
                     $smarty->assign('oasl_widget_rnd', mt_rand(99999, 9999999));
+                    $smarty->assign('oasl_widget_callback', oneall_social_login_tools::get_callback_uri(true));
                     $smarty->assign('oasl_widget_css', '');
                     $smarty->assign('oasl_widget_providers', '"' . implode('","', $providers) . '"');
 
@@ -841,10 +838,8 @@ class OneallSocialLogin extends Module
                 $smarty->assign('oasl_widget_providers_array', $providers);
             }
 
-            // Add Our JavaScript
-            // $this->context->controller->addJs($this->_path . 'views/js/' . $this->name . '.js');
+            // Add Our JavaScript/CSS
             $this->context->controller->registerJavascript($this->name . '.js', $this->_path . 'views/js/' . $this->name . '.js', ['position' => 'bottom', 'priority' => 8000]);
-
             $this->context->controller->registerStylesheet($this->name . '.css', $this->_path . 'views/css/' . $this->name . '.css', ['position' => 'bottom', 'priority' => 8000]);
 
             // Read library
@@ -866,7 +861,7 @@ class OneallSocialLogin extends Module
         if (!$this->context->customer->isLogged())
         {
             // Check for callback arguments.
-            if (Tools::getIsset('oa_action') === true and Tools::getIsset('connection_token') === true)
+            if (Tools::getIsset('oa_action') === true && Tools::getIsset('connection_token') === true)
             {
                 // Extract the callback arguments.
                 $oa_action = trim(Tools::getValue('oa_action'));
@@ -941,16 +936,11 @@ class OneallSocialLogin extends Module
                             }
                         }
 
-                        // Create a user new account.
+                        // Create a new user account.
                         if (empty($id_customer))
                         {
                             // Notify the customer ?
                             $customer_email_notify = true;
-
-                            // Redirection url.
-                            $redirect_to = $this->context->link->getModuleLink($this->name, 'register', array(
-                                'back' => oneall_social_login_tools::get_current_url()
-                            ));
 
                             // How do we have to proceed?
                             switch (Configuration::get('OASL_DATA_HANDLING'))
@@ -978,30 +968,53 @@ class OneallSocialLogin extends Module
                                     {
                                         $data['user_first_name'] = 'John';
                                     }
-                                    break;
+                                break;
 
                                 // Ask for manual completion if any of the fields is empty or if the email is already taken.
                                 case 'ask':
-                                    if (empty($data['user_email']) or empty($data['user_first_name']) or empty($data['user_last_name']) or oneall_social_login_tools::get_id_customer_for_email_address($data['user_email']) !== false)
+                                    if (empty($data['user_email']) || empty($data['user_first_name']) || empty($data['user_last_name']) || oneall_social_login_tools::get_id_customer_for_email_address($data['user_email']) !== false)
                                     {
-                                        // Save the data in the session.
-                                        $this->context->cookie->oasl_data = base64_encode(serialize($data));
+                                    	// To which URL shall the user return to?
+                                    	$return_to = trim (Tools::getValue('return_to'));
+                                    	if (empty ($return_to))
+                                    	{
+                                    		$return_to = oneall_social_login_tools::get_current_url();
+                                    	}
 
-                                        // Redirect to the request form
-                                        header('Location: ' . $redirect_to);
+                                    	// Add to cookie data
+                                    	$data['return_to'] = $return_to;
+
+                                        // Save the data in the session.
+                                        $this->context->cookie->oasl_data = base64_encode (serialize ($data));
+                                        $this->context->cookie->write();
+
+                                        // Redirect to the Social Login registration form
+                                        header('Location: ' . $this->context->link->getModuleLink($this->name, 'register'));
                                         exit();
                                     }
-                                    break;
+                                break;
 
                                 // Always verify the fields
                                 default:
+
+                                	// To which URL shall the user return to?
+                                	$return_to = trim (Tools::getValue('return_to'));
+                                	if (empty ($return_to))
+                                	{
+                                		$return_to = oneall_social_login_tools::get_current_url();
+                                	}
+
+                                	// Add to cookie data
+                                	$data['return_to'] = $return_to;
+
                                     // Save the data in the session.
                                     $this->context->cookie->oasl_data = base64_encode(serialize($data));
+                                    $this->context->cookie->write();
 
-                                    // Redirect to the request form
-                                    header('Location: ' . $redirect_to);
+                                     // Redirect to the Social Login registration form
+                                    header('Location: ' . $this->context->link->getModuleLink($this->name, 'register'));
                                     exit();
-                                    break;
+                                break;
                             }
 
                             // Email flags.
@@ -1013,18 +1026,23 @@ class OneallSocialLogin extends Module
                         }
 
                         // Login.
-                        if (!empty($id_customer) and oneall_social_login_tools::login_customer($id_customer))
+                        if (!empty($id_customer) && oneall_social_login_tools::login_customer($id_customer))
                         {
-                            // Remove the data (Should not be set here)
+                            // To which URL shall the user return to?
+                            $return_to = trim (Tools::getValue('return_to'));
+                            if (empty ($return_to))
+                            {
+                            	$return_to = oneall_social_login_tools::get_current_url();
+                            }
+
+                            // Remove Social Login Cookie
                             if (isset($this->context->cookie->oasl_data))
                             {
                                 unset($this->context->cookie->oasl_data);
                             }
 
-                            // A refresh is required to update the page
-                            $back = trim(Tools::getValue('back'));
-                            $back = (!empty($back) ? $back : oneall_social_login_tools::get_current_url());
-                            Tools::redirect($back);
+                            // Redirect
+                            Tools::redirect($return_to);
                         }
                     }
                 }

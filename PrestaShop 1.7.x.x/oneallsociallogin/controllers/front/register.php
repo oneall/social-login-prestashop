@@ -35,14 +35,6 @@ class OneAllSocialLoginRegisterModuleFrontController extends ModuleFrontControll
         parent::initContent();
         global $smarty;
 
-        // Restore back value.
-        $back = Tools::getValue('back');
-
-        if (!empty($back))
-        {
-            $this->context->smarty->assign('back', Tools::safeOutput($back));
-        }
-
         // Did an error occur?
         $have_error = true;
 
@@ -124,15 +116,16 @@ class OneAllSocialLoginRegisterModuleFrontController extends ModuleFrontControll
                         $id_customer = oneall_social_login_tools::create_customer_from_data($data, $send_email_to_admin, $send_email_to_customer);
 
                         // Login the customer.
-                        if (!empty($id_customer) and oneall_social_login_tools::login_customer($id_customer))
+                        if (!empty ($id_customer) && oneall_social_login_tools::login_customer($id_customer))
                         {
+                        	// Redirection URL is set
+                       		$redirect_url = ( ! empty ($data['return_to']) ? $data['return_to'] : oneall_social_login_tools::get_current_url());
+
                             // Remove the data
                             unset($this->context->cookie->oasl_data);
 
-                            // A refresh is required to update the page
-                            $back = trim(Tools::getValue('back'));
-                            $back = (!empty($back) ? $back : oneall_social_login_tools::get_current_url());
-                            Tools::redirect($back);
+                            // Redirect
+                            Tools::redirect($redirect_url);
                         }
                     }
                 }

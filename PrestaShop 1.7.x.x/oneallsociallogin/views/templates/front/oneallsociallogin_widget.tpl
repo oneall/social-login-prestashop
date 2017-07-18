@@ -58,7 +58,7 @@
 			<script type="text/javascript">
 			  var _oneall = _oneall || [];
 				_oneall.push(['social_login', 'set_providers', providers]);
-				_oneall.push(['social_login', 'set_callback_uri', window.location.href]);
+				_oneall.push(['social_login', 'set_callback_uri', '{$oasl_widget_callback}']);
 				_oneall.push(['social_login', 'set_custom_css_uri', '{$oasl_widget_css}']);
   			_oneall.push(['social_login', 'do_render_ui', 'oneall_social_login_providers_{$oasl_widget_rnd}']);			
 			</script>
@@ -77,7 +77,7 @@
 			<script type="text/javascript">
 			  var _oneall = _oneall || [];
 				_oneall.push(['social_login', 'set_providers', providers]);
-				_oneall.push(['social_login', 'set_callback_uri', window.location.href]);
+				_oneall.push(['social_login', 'set_callback_uri', '{$oasl_widget_callback}']);
 				_oneall.push(['social_login', 'set_custom_css_uri', '{$oasl_widget_css}']);
   			_oneall.push(['social_login', 'do_render_ui', 'oneall_social_login_providers_{$oasl_widget_rnd}']);			
 			</script>
@@ -95,7 +95,7 @@
 			<script type="text/javascript">
 				var _oneall = _oneall || [];
 				_oneall.push(['social_login', 'set_providers', providers]);
-				_oneall.push(['social_login', 'set_callback_uri', window.location.href]);
+				_oneall.push(['social_login', 'set_callback_uri', '{$oasl_widget_callback}']);
 				_oneall.push(['social_login', 'set_custom_css_uri', '{$oasl_widget_css}']);
 	  		_oneall.push(['social_login', 'do_render_ui', 'oneall_social_login_providers_{$oasl_widget_rnd}']);	
 			</script>
@@ -108,7 +108,7 @@
 	<script type="text/javascript">
 		var _oneall = _oneall || [];
 		_oneall.push(['social_login', 'set_providers', providers]);
-		_oneall.push(['social_login', 'set_callback_uri', window.location.href]);
+		_oneall.push(['social_login', 'set_callback_uri', '{$oasl_widget_callback}']);
 		_oneall.push(['social_login', 'set_custom_css_uri', '{$oasl_widget_css}']);
   	_oneall.push(['social_login', 'do_render_ui', 'oneall_social_login_providers_{$oasl_widget_rnd}']);		
 	</script>	
@@ -124,7 +124,7 @@
 			<script type="text/javascript">
 			  var _oneall = _oneall || [];
 				_oneall.push(['social_login', 'set_providers', providers]);
-				_oneall.push(['social_login', 'set_callback_uri', window.location.href]);
+				_oneall.push(['social_login', 'set_callback_uri', '{$oasl_widget_callback}']);
 				_oneall.push(['social_login', 'set_custom_css_uri', '{$oasl_widget_css}']);
   			_oneall.push(['social_login', 'do_render_ui', 'oneall_social_login_providers_{$oasl_widget_rnd}']);			
 			</script>
