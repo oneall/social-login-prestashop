@@ -103,9 +103,9 @@ class OneAllSocialLoginRegisterModuleFrontController extends ModuleFrontControll
                     if (count($this->errors) == 0)
                     {
                         // Store the manually entered email fields.
-                        $data['user_email'] = strtolower($email);
-                        $data['user_first_name'] = ucwords(strtolower($firstname));
-                        $data['user_last_name'] = ucwords(strtolower($lastname));
+                        $data['user_email'] = Tools::strtolower($email);
+                        $data['user_first_name'] = Tools::ucwords($firstname);
+                        $data['user_last_name'] = Tools::ucwords($lastname);
                         $data['user_newsletter'] = ($newsletter == 1 ? 1 : 0);
 
                         // Email flags.
