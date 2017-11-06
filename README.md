@@ -5,7 +5,7 @@
 * [Social Login for PrestaShop 1.7+](https://github.com/oneall/social-login-prestashop/tree/prestashop/1.7+)
 
 
-# Social Login 1.2.0 for PrestaShop 8.0+
+# Social Login 1.2.0 for PrestaShop 1.4+
 Social Login for PrestaShop allows your users to login and register with 35+ social networks. 
 It increases your PrestaShop user registration rate by simplifying the registration process for 
 new users and provides permission-based social data retrieved from the social network profiles.
