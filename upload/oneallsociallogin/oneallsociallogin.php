@@ -1,7 +1,7 @@
 <?php
 /**
  * @package       OneAll Social Login
- * @copyright     Copyright 2011-2017 http://www.oneall.com
+ * @copyright     Copyright 2012 http://www.oneall.com - All rights reserved.
  * @license       GNU/GPL 2 or later
  *
  * This program is free software; you can redistribute it and/or
@@ -22,28 +22,25 @@
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
  */
-
 if (!defined('_PS_VERSION_'))
 {
-    exit();
+    exit;
 }
+
 class OneallSocialLogin extends Module
 {
     /**
      * Constructor
-     */
+     **/
     public function __construct()
     {
         $this->name = 'oneallsociallogin';
         $this->tab = 'administration';
-        $this->version = '1.2';
+        $this->version = '1.1.0';
         $this->author = 'OneAll LLC';
-        $this->need_instance = 0;
-        $this->ps_versions_compliancy = array(
-            'min' => '1.7'
-        );
-        $this->module_key = '2571f9dab09af193a8ca375a09133873';
+        $this->need_instance = 1;
         $this->secure_key = Tools::encrypt($this->name);
+        $this->module_key = '2571f9dab09af193a8ca375a09133873';
 
         parent::__construct();
 
@@ -51,25 +48,37 @@ class OneallSocialLogin extends Module
         $this->description = $this->l('Professionally developed and free module that allows your users to register and login to PrestaShop with their Social Network account (Twitter, Facebook, LinkedIn, Google ...)');
         $this->confirmUninstall = $this->l('Are you sure you want to uninstall Social Login?');
 
-        // This is the first time that the class is used
+        //This is the first time that the class is used
         if (!Configuration::get('OASL_FIRST_INSTALL'))
         {
-            // Setup default values
             Configuration::updateValue('OASL_FIRST_INSTALL', '1');
+
+            //API Credentials
             Configuration::updateValue('OASL_API_HANDLER', 'curl');
             Configuration::updateValue('OASL_API_PORT', '443');
             Configuration::updateValue('OASL_PROVIDERS', 'facebook,twitter,google,linkedin');
             Configuration::updateValue('OASL_LINK_ACCOUNT_DISABLE', 0);
-            Configuration::updateValue('OASL_JS_HOOK_AUTH_DISABLE', 0);
-            Configuration::updateValue('OASL_JS_HOOK_LOGIN_DISABLE', 0);
-            Configuration::updateValue('OASL_HOOK_LEFT_DISABLE', 0);
+
+            // Hooks.
+            Configuration::updateValue('OASL_HOOK_LEFT_DISABLE', 1);
+            Configuration::updateValue('OASL_HOOK_LEFT_TITLE', $this->l('Connect with:'));
             Configuration::updateValue('OASL_HOOK_RIGHT_DISABLE', 0);
+            Configuration::updateValue('OASL_HOOK_RIGHT_TITLE', $this->l('Connect with:'));
+
+            // Data Handling.
             Configuration::updateValue('OASL_DATA_HANDLING', 'verify');
+
+            // Email Settings.
             Configuration::updateValue('OASL_EMAIL_CUSTOMER_DISABLE', '0');
             Configuration::updateValue('OASL_EMAIL_ADMIN_DISABLE', '0');
         }
 
-        // Requires includes
+        if (!Configuration::get('OASL_API_SUBDOMAIN'))
+        {
+            $this->warning = $this->l('The API Settings must be filled out in order to use this module correctly.');
+        }
+
+        //Required includes
         require_once dirname(__FILE__) . "/includes/tools.php";
         require_once dirname(__FILE__) . "/includes/providers.php";
     }
@@ -82,7 +91,7 @@ class OneallSocialLogin extends Module
 
     /**
      * Display Admin Menu
-     */
+     **/
     public function getContent()
     {
         // Compute the form url.
@@ -96,35 +105,30 @@ class OneallSocialLogin extends Module
         }
         $form_url = rtrim($form_url, '&');
 
-        // Add external files.
-        $this->context = Context::getContext();
-        $this->context->controller->addCSS($this->_path . 'views/css/admin.css');
-        $this->context->controller->addJS($this->_path . 'views/js/admin.js');
-
         // This is what is being displayed.
         $html = '';
 
-        // Submit Button Clicked
+        // The submit button has been clicked.
         if (Tools::isSubmit('submit'))
         {
-            // Read API Credentials
+            // Read API credentials.
             $api_key = trim(Tools::getValue('OASL_API_KEY'));
             $api_password = trim(Tools::getValue('OASL_API_PASSWORD'));
             $api_subdomain = strtolower(trim(Tools::getValue('OASL_API_SUBDOMAIN')));
 
-            // Check for full domain
+            // Check if the full domain has been entered.
             if (preg_match("/([a-z0-9\-]+)\.api\.oneall\.com/i", $api_subdomain, $matches))
             {
                 $api_subdomain = $matches[1];
             }
 
-            // Read API Connection Settings
+            //Read API Connection Settings
             $api_handler = Tools::getValue('OASL_API_HANDLER');
             $api_handler = ($api_handler == 'fsockopen' ? 'fsockopen' : 'curl');
             $api_port = Tools::getValue('OASL_API_PORT');
             $api_port = ($api_port == 80 ? 80 : 443);
 
-            // Read Providers
+            //Read Providers
             $use_provider_keys = array();
             $tmp_provider_keys = Tools::getValue('OASL_PROVIDERS');
             if (is_array($tmp_provider_keys) and count($tmp_provider_keys) > 0)
@@ -139,83 +143,65 @@ class OneallSocialLogin extends Module
                 }
             }
 
-            // Hook Left
+            //Hook Left
             $hook_left_disable = (Tools::getValue('OASL_HOOK_LEFT_DISABLE') == 1 ? 1 : 0);
+            $hook_left_title = trim(Tools::getValue('OASL_HOOK_LEFT_TITLE'));
 
-            // Hook Right
+            //Hook Right
             $hook_right_disable = (Tools::getValue('OASL_HOOK_RIGHT_DISABLE') == 1 ? 1 : 0);
+            $hook_right_title = trim(Tools::getValue('OASL_HOOK_RIGHT_TITLE'));
 
-            // JavaScript Hook for Authentication
-            $js_hook_auth_disable = (Tools::getValue('OASL_JS_HOOK_AUTH_DISABLE') == 1 ? 1 : 0);
-
-            // JavaScript Hook for Login Page
-            $js_hook_login_disable = (Tools::getValue('OASL_JS_HOOK_LOGIN_DISABLE') == 1 ? 1 : 0);
-
-            // Settings
+            //Settings
             $link_account_disable = (Tools::getValue('OASL_LINK_ACCOUNT_DISABLE') == 1 ? 1 : 0);
             $data_handling = Tools::getValue('OASL_DATA_HANDLING');
-            $data_handling = (in_array($data_handling, array(
-                'ask',
-                'verify',
-                'auto'
-            )) ? $data_handling : 'verify');
-
-            // Email Settins
+            $data_handling = (in_array($data_handling, array('ask', 'verify', 'auto')) ? $data_handling : 'verify');
             $email_customer_disable = (Tools::getValue('OASL_EMAIL_CUSTOMER_DISABLE') == 1 ? 1 : 0);
             $email_admin_disable = (Tools::getValue('OASL_EMAIL_ADMIN_DISABLE') == 1 ? 1 : 0);
 
-            // Save Values
+            //Save Values
             Configuration::updateValue('OASL_API_KEY', $api_key);
             Configuration::updateValue('OASL_API_PASSWORD', $api_password);
             Configuration::updateValue('OASL_API_SUBDOMAIN', $api_subdomain);
             Configuration::updateValue('OASL_API_HANDLER', $api_handler);
             Configuration::updateValue('OASL_API_PORT', $api_port);
             Configuration::updateValue('OASL_PROVIDERS', implode(',', $use_provider_keys));
-            Configuration::updateValue('OASL_JS_HOOK_AUTH_DISABLE', $js_hook_auth_disable);
-            Configuration::updateValue('OASL_JS_HOOK_LOGIN_DISABLE', $js_hook_login_disable);
             Configuration::updateValue('OASL_HOOK_LEFT_DISABLE', $hook_left_disable);
+            Configuration::updateValue('OASL_HOOK_LEFT_TITLE', $hook_left_title);
             Configuration::updateValue('OASL_HOOK_RIGHT_DISABLE', $hook_right_disable);
+            Configuration::updateValue('OASL_HOOK_RIGHT_TITLE', $hook_right_title);
             Configuration::updateValue('OASL_LINK_ACCOUNT_DISABLE', $link_account_disable);
             Configuration::updateValue('OASL_DATA_HANDLING', $data_handling);
             Configuration::updateValue('OASL_EMAIL_ADMIN_DISABLE', $email_admin_disable);
             Configuration::updateValue('OASL_EMAIL_CUSTOMER_DISABLE', $email_customer_disable);
         }
 
-        // Read API Credentials
+        //Read API Credentials
         $api_key = Configuration::get('OASL_API_KEY');
         $api_password = Configuration::get('OASL_API_PASSWORD');
         $api_subdomain = Configuration::get('OASL_API_SUBDOMAIN');
 
-        // Read API Connection Settings
+        //Read API Connection Settings
         $api_handler = Configuration::get('OASL_API_HANDLER');
         $api_handler = ($api_handler == 'fsockopen' ? 'fsockopen' : 'curl');
         $api_port = Configuration::get('OASL_API_PORT');
         $api_port = ($api_port == 80 ? 80 : 443);
 
-        // Hook Left
+        //Hook Left
         $hook_left_disable = Configuration::get('OASL_HOOK_LEFT_DISABLE') == 1 ? 1 : 0;
+        $hook_left_title = Configuration::get('OASL_HOOK_LEFT_TITLE');
 
-        // Hook Right
+        //Hook Right
         $hook_right_disable = Configuration::get('OASL_HOOK_RIGHT_DISABLE') == 1 ? 1 : 0;
+        $hook_right_title = Configuration::get('OASL_HOOK_RIGHT_TITLE');
 
-        // JavaScript Hook for Authentication
-        $js_hook_auth_disable = Configuration::get('OASL_JS_HOOK_AUTH_DISABLE') == 1 ? 1 : 0;
-
-        // JavaScript Hook for Login Page
-        $js_hook_login_disable = Configuration::get('OASL_JS_HOOK_LOGIN_DISABLE') == 1 ? 1 : 0;
-
-        // Settings
+        //Settings
         $link_account_disable = Configuration::get('OASL_LINK_ACCOUNT_DISABLE') == 1 ? 1 : 0;
         $data_handling = Configuration::get('OASL_DATA_HANDLING');
-        $data_handling = (in_array($data_handling, array(
-            'ask',
-            'verify',
-            'auto'
-        )) ? $data_handling : 'verify');
+        $data_handling = (in_array($data_handling, array('ask', 'verify', 'auto')) ? $data_handling : 'verify');
         $email_customer_disable = Configuration::get('OASL_EMAIL_CUSTOMER_DISABLE') == 1 ? 1 : 0;
         $email_admin_disable = Configuration::get('OASL_EMAIL_ADMIN_DISABLE') == 1 ? 1 : 0;
 
-        // Read providers
+        //Read providers
         $use_provider_keys = array();
         $tmp_provider_keys = explode(',', Configuration::get('OASL_PROVIDERS'));
         if (is_array($tmp_provider_keys) and count($tmp_provider_keys) > 0)
@@ -230,16 +216,24 @@ class OneallSocialLogin extends Module
         }
 
         $html .= '
-			<h2>' . $this->l('OneAll Social Login') . ' ' . $this->version . '</h2>
+			<script type="text/javascript" src="' . (__PS_BASE_URI__) . 'modules/' . $this->name . '/assets/js/admin.js"></script>
+			<link type="text/css" href="' . (__PS_BASE_URI__) . 'modules/' . $this->name . '/assets/css/admin.css" rel="stylesheet"></link>
+			<h2>' . $this->l('OneAll Social Login') . '</h2>
 			<p>
-				' . $this->l('Allow your visitors to comment, login and register with 25+ Social Networks like for example Twitter, Facebook, LinkedIn, Hyves, VKontakte, Google or Yahoo.') . '
+				' . $this->l('Allow your visitors to comment, login and register with 20+ Social Networks like for example Twitter, Facebook, LinkedIn, Hyves, VKontakte, Google or Yahoo.') . '
 				' . $this->l('Draw a larger audience and increase your user engagement and conversion rates in a few simple steps.') . '
 			</p>
 		<div class="oasl_box">
 			<div class="oasl_box_title">' . $this->l('The setup takes only a couple of minutes!') . '</div>
-				<p>To be able to use this plugin you first of all need to create a free account at <a href="http://app.oneall.com" target="_blank">http://www.oneall.com</a> and setup a Site.</p>
-				<p>After having created your account and setup your Site, please enter the Site settings in the form <strong>API Settings</strong> below.
-				<p><a href="http://app.oneall.com" target="_blank" class="button">Click here to setup your free account</a></p>
+				<p>
+					' . $this->l('To be able to use this plugin you first of all need to create a free account at') . ' <a href="http://app.oneall.com" target="_blank">http://www.oneall.com</a> ' . $this->l('and setup a Site.') . '
+				</p>
+				<p>
+					' . $this->l('After having created your account and setup your Site, please enter the Site settings in the form <strong>API Settings</strong> below.') . '
+				</p>
+				<p>
+					<a href="http://app.oneall.com" target="_blank" class="oasl_button">' . $this->l('Click here to setup your free account') . '</a>
+				</p>
 		</div>
 		<form action="' . Tools::safeOutput($form_url) . '" method="post">
 			<fieldset>
@@ -259,7 +253,7 @@ class OneallSocialLogin extends Module
 					<p>' . $this->l('Using port 80 is a bit faster, does not need OpenSSL but is also less secure.') . '</p>
 				</div>
 				<div class="margin-form">
-					<input type="button" id="OASL_VERIFY_CONNECTION_HANDLER" value="' . $this->l('AutoDetect the best API Connection Settings') . '" class="button" />
+					<input type="button" id="OASL_VERIFY_CONNECTION_HANDLER" value="' . $this->l('AutoDetect the best API Connection Settings') . '" class="oasl_button" />
 				</div>
 				<div class="margin-form">
 					<span class="oasl_message" id="OASL_VERIFY_CONNECTION_HANDLER_RESULT"></span>
@@ -284,39 +278,10 @@ class OneallSocialLogin extends Module
 					<input type="text" name="OASL_API_PASSWORD" id="OASL_API_PASSWORD" size="60" value="' . htmlspecialchars($api_password) . '" />
 				</div>
 				<div class="margin-form">
-					<input type="button" id="OASL_VERIFY_CONNECTION_SETTINGS" value="' . $this->l('Verify the API Settings') . '" class="button" />
+					<input type="button" id="OASL_VERIFY_CONNECTION_SETTINGS" value="' . $this->l('Verify the API Settings') . '" class="oasl_button" />
 				</div>
 				<div class="margin-form">
 					<span class="oasl_message" id="OASL_VERIFY_CONNECTION_SETTINGS_RESULT"></span>
-				</div>
-			</fieldset>
-
-			<fieldset style="margin-top:20px">
-				<legend>' . $this->l('Custom Embedding') . '</legend>
-				<div class="oasl_notice">' . $this->l('You can manually embed Social Login by adding this code to a .tpl file of your PrestaShop:') . '</div>
-				<label style="width:300px;text-align:left"><code>{$HOOK_OASL_CUSTOM nofilter}</code></label>
-				<div style="margin-bottom: 20px;">
-						' . $this->l('Simply copy the code and add it to any .tpl file in your /themes directory.') . '
-				</div>
-			</fieldset>
-
-			<fieldset style="margin-top:20px">
-				<legend>' . $this->l('Registration Page') . '</legend>
-				<div class="oasl_notice">' . $this->l('Displays Social Login on the create account page of your shop') . '</div>
-				<label>' . $this->l('Enable Registration Page Hook?') . '</label>
-				<div class="margin-form" style="margin-bottom: 20px;">
-					<input type="radio" name="OASL_JS_HOOK_AUTH_DISABLE" id="OASL_JS_HOOK_AUTH_DISABLE_0" value="0" ' . ($js_hook_auth_disable != 1 ? 'checked="checked"' : '') . ' /> ' . $this->l('Enable') . '&nbsp;
-					<input type="radio" name="OASL_JS_HOOK_AUTH_DISABLE" id="OASL_JS_HOOK_AUTH_DISABLE_1" value="1" ' . ($js_hook_auth_disable == 1 ? 'checked="checked"' : '') . ' /> ' . $this->l('Disable') . '<br />
-				</div>
-			</fieldset>
-
-			<fieldset style="margin-top:20px">
-				<legend>' . $this->l('Authentication Page') . '</legend>
-				<div class="oasl_notice">' . $this->l('Displays Social Login on the sign in page of your shop') . '</div>
-				<label>' . $this->l('Enable Authentication Page Hook?') . '</label>
-				<div class="margin-form" style="margin-bottom: 20px;">
-					<input type="radio" name="OASL_JS_HOOK_LOGIN_DISABLE" id="OASL_JS_HOOK_LOGIN_DISABLE_0" value="0" ' . ($js_hook_login_disable != 1 ? 'checked="checked"' : '') . ' /> ' . $this->l('Enable') . '&nbsp;
-					<input type="radio" name="OASL_JS_HOOK_LOGIN_DISABLE" id="OASL_JS_HOOK_LOGIN_DISABLE_1" value="1" ' . ($js_hook_login_disable == 1 ? 'checked="checked"' : '') . ' /> ' . $this->l('Disable') . '<br />
 				</div>
 			</fieldset>
 
@@ -328,6 +293,11 @@ class OneallSocialLogin extends Module
 					<input type="radio" name="OASL_HOOK_LEFT_DISABLE" id="OASL_HOOK_LEFT_DISABLE_0" value="0" ' . ($hook_left_disable != 1 ? 'checked="checked"' : '') . ' /> ' . $this->l('Enable') . '&nbsp;
 					<input type="radio" name="OASL_HOOK_LEFT_DISABLE" id="OASL_HOOK_LEFT_DISABLE_1" value="1" ' . ($hook_left_disable == 1 ? 'checked="checked"' : '') . ' /> ' . $this->l('Disable') . '<br />
 				</div>
+				<label>' . $this->l('Left Side Caption') . ':</label>
+				<div class="margin-form">
+					<input type="text" name="OASL_HOOK_LEFT_TITLE" id="OASL_HOOK_LEFT_TITLE" size="60" value="' . htmlspecialchars($hook_left_title) . '" />
+					<p>	' . $this->l('Leave empty for none.') . '</p>
+				</div>
 			</fieldset>
 
 			<fieldset style="margin-top:20px">
@@ -337,6 +307,11 @@ class OneallSocialLogin extends Module
 				<div class="margin-form" style="margin-bottom: 20px;">
 					<input type="radio" name="OASL_HOOK_RIGHT_DISABLE" id="OASL_HOOK_RIGHT_DISABLE_0" value="0" ' . ($hook_right_disable != 1 ? 'checked="checked"' : '') . ' /> ' . $this->l('Enable') . '&nbsp;
 					<input type="radio" name="OASL_HOOK_RIGHT_DISABLE" id="OASL_HOOK_RIGHT_DISABLE_1" value="1" ' . ($hook_right_disable == 1 ? 'checked="checked"' : '') . ' /> ' . $this->l('Disable') . '<br />
+				</div>
+				<label>' . $this->l('Right Side Caption') . ':</label>
+				<div class="margin-form">
+					<input type="text" name="OASL_HOOK_RIGHT_TITLE" id="OASL_HOOK_RIGHT_TITLE" size="60" value="' . htmlspecialchars($hook_right_title) . '" />
+					<p>' . $this->l('Leave empty for none.') . '</p>
 				</div>
 			</fieldset>
 
@@ -386,7 +361,7 @@ class OneallSocialLogin extends Module
 			<fieldset style="margin-top:20px">
 					<legend>' . $this->l('Tick the social networks to enable') . '</legend>';
 
-        // Add providers
+        //Add providers
         $providers = oneall_social_login_providers::get_list();
         foreach ($providers as $key => $data)
         {
@@ -408,13 +383,13 @@ class OneallSocialLogin extends Module
 			<fieldset style="margin-top:20px">
 				<legend>' . $this->l('Save API Settings') . '</legend>
 				<div class="margin-form">
-					<input type="submit" class="button" name="submit" value="' . $this->l('Save Social Login Settings') . '">
+					<input type="submit" class="oasl_button" name="submit" value="' . $this->l('Save Social Login Settings') . '">
 				</div>
 			</fieldset>
 			<script type="text/javascript">
 				<!--
 					var OASL_AJAX_TOKEN = \'' . sha1(_COOKIE_KEY_ . 'ONEALLSOCIALLOGIN') . '\';
-					var OASL_AJAX_PATH  = \'' . Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/oneallsociallogin/assets/ajax/admin.php\';
+					var OASL_AJAX_PATH  = \'' . Tools::getShopDomain(true, true) . __PS_BASE_URI__ . 'modules/oneallsociallogin/assets/ajax/admin.php\';
 				//-->
 			</script>
 		</form>';
@@ -428,13 +403,18 @@ class OneallSocialLogin extends Module
      * **************************************************************************
      */
 
+    protected static function display_error($error)
+    {
+        echo '<div class="error"><h3>OneAll Social Login Error:</h3><ol><li>' . $error . '</li></ol></div>';
+    }
+
     /**
      * Moves a hook to the given position
-     */
+     **/
     protected function move_hook_position($hook_name, $position)
     {
         // Get the hook identifier.
-        if (($id_hook = Hook::getIdByName($hook_name)) !== false)
+        if (($id_hook = Hook::get($hook_name)) !== false)
         {
             // Load the module.
             if (($module = Module::getInstanceByName($this->name)) !== false)
@@ -451,96 +431,77 @@ class OneallSocialLogin extends Module
             }
         }
 
-        // An error occurred.
+        //An error occurred.
 
         return false;
     }
 
     /**
      * Returns a list of files to install
-     */
+     **/
     protected function get_files_to_install()
     {
-        // Read current language.
-        $language = strtolower(trim(strval(Language::getIsoById($this->context->language->id))));
-
-        // All languages to be installed for.
-        $languages = array_unique(array('en', $language));
-
-        // Install email templates
-        foreach ($languages as $language)
-        {
-            // Make sure the directory exists
-            if (is_dir(_PS_MAIL_DIR_ . $language . '/'))
-            {
-                // oneallsociallogin_account.html
-                $files[] = array(
-                    'name' => 'oneallsociallogin_account.html',
-                    'source' => _PS_MODULE_DIR_ . $this->name . '/upload/mails/en/',
-                    'target' => _PS_MAIL_DIR_ . $language . '/'
-                );
-
-                // oneallsociallogin_account.txt
-                $files[] = array(
-                    'name' => 'oneallsociallogin_account.txt',
-                    'source' => _PS_MODULE_DIR_ . $this->name . '/upload/mails/en/',
-                    'target' => _PS_MAIL_DIR_ . $language . '/'
-                );
-            }
-        }
-
-        // Done
-
-        return $files;
+        return array(
+            'oneallsociallogin.php' => array(
+                'source' => _PS_MODULE_DIR_ . $this->name . '/upload/',
+                'target' => _PS_ROOT_DIR_ . '/'
+            ),
+            'OneAllSocialLoginController.php' => array(
+                'source' => _PS_MODULE_DIR_ . $this->name . '/upload/controllers/',
+                'target' => _PS_ROOT_DIR_ . '/controllers/'
+            ),
+            'oneallsociallogin.tpl' => array(
+                'source' => _PS_MODULE_DIR_ . $this->name . '/upload/themes/default/',
+                'target' => _PS_THEME_DIR_
+            ),
+            'oneallsociallogin.css' => array(
+                'source' => _PS_MODULE_DIR_ . $this->name . '/upload/themes/default/css/',
+                'target' => _PS_THEME_DIR_ . 'css/'
+            ),
+            'oneallsociallogin_account.html' => array(
+                'source' => _PS_MODULE_DIR_ . $this->name . '/upload/mails/en/',
+                'target' => _PS_MAIL_DIR_ . 'en/'
+            ),
+            'oneallsociallogin_account.txt' => array(
+                'source' => _PS_MODULE_DIR_ . $this->name . '/upload/mails/en/',
+                'target' => _PS_MAIL_DIR_ . 'en/'
+            )
+        );
     }
 
     /**
      * Returns a list of hooks to install
-     */
+     **/
     protected function get_hooks_to_install()
     {
         return array(
-
             // Widget
-            'displayLeftColumn' => array(
+            'leftColumn' => array(
                 'pos' => 1
             ),
-
             // Widget
-            'displayRightColumn' => array(
+            'rightColumn' => array(
                 'pos' => 1
             ),
-
-            // Create account
-            'displayCustomerAccountFormTop' => array(
-                'pos' => 1
-            ),
-
-            // Create account
-            'displayCustomerAccountForm' => array(
-                'pos' => 1
-            ),
-
-            // Login
-            'displayCustomerLoginFormAfter' => array(
-                'pos' => 1
-            ),
-
             // Callback
-            'displayTop' => array(),
-
-            // Library
-            'displayHeader' => array()
+            'top' => array(),
+            //Library
+            'header' => array()
         );
     }
 
     /**
      * Install
-     */
+     **/
     public function install()
     {
-        // Load context
-        $this->context = Context::getContext();
+        // Check PS version compliancy (Needs to be lower or equal to 1.4.9)
+        if (!version_compare(_PS_VERSION_, '1.4.9', '<='))
+        {
+            self::display_error('This version of Social Login can only be used with PrestaShop 1.4.9 or less, your version of PrestaShop is: ' . _PS_VERSION_);
+
+            return false;
+        }
 
         // Start Installation
         if (!parent::install())
@@ -548,30 +509,28 @@ class OneallSocialLogin extends Module
             return false;
         }
 
-        // Store the added files
+        //Store the added files
         $files_added = array();
 
-        // Get files to install.
+        // Copy controller files.
         $files = $this->get_files_to_install();
-
-        // Install files.
-        foreach ($files as $file_data)
+        foreach ($files as $file_name => $file_data)
         {
-            if (is_array($file_data) && !empty($file_data['name']) && !empty($file_data['source']) && !empty($file_data['target']))
+            if (is_array($file_data) and !empty($file_data['source']) and !empty($file_data['target']))
             {
-                if (!file_exists($file_data['target'] . $file_data['name']))
+                if (!file_exists($file_data['target'] . $file_name))
                 {
-                    if (!copy($file_data['source'] . $file_data['name'], $file_data['target'] . $file_data['name']))
+                    if (!@copy($file_data['source'] . $file_name, $file_data['target'] . $file_name))
                     {
                         // Add Error
-                        $this->context->controller->errors[] = 'Could not copy the file ' . $file_data['source'] . $file_data['name'] . ' to ' . $file_data['target'] . $file_data['name'];
+                        self::display_error('Could not copy the file ' . $file_name . ' to the directory ' . $file_data['target']);
 
-                        // Rollback the copied files in case of an error
-                        foreach ($files_added as $file_added)
+                        // Remove the copied files.
+                        foreach ($files_added as $file_name)
                         {
-                            if (file_exists($file_added))
+                            if (file_exists($file_name))
                             {
-                                @unlink($file_added);
+                                @unlink($file_name);
                             }
                         }
 
@@ -581,7 +540,7 @@ class OneallSocialLogin extends Module
                     }
                     else
                     {
-                        $files_added[] = $file_data['target'] . $file_data['name'];
+                        $files_added[] = $file_data['target'] . $file_name;
                     }
                 }
             }
@@ -593,7 +552,7 @@ class OneallSocialLogin extends Module
         {
             if (!$this->registerHook($hook_name))
             {
-                $this->context->controller->errors[] = 'Could not register the hook ' . $hook_name;
+                self::display_error('Could not register the hook ' . $hook_name);
 
                 return false;
             }
@@ -610,7 +569,7 @@ class OneallSocialLogin extends Module
         $query = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'oasl_user` (`id_oasl_user` int(10) unsigned NOT NULL AUTO_INCREMENT, `id_customer` int(10) unsigned NOT NULL, `user_token` varchar(48) NOT NULL, `date_add` datetime NOT NULL, PRIMARY KEY (`id_oasl_user`))';
         if (!Db::getInstance()->execute($query))
         {
-            $this->context->controller->errors[] = "Could not create the table " . _DB_PREFIX_ . "oasl_user";
+            self::display_error("Could not create the table " . _DB_PREFIX_ . "oasl_user");
 
             return false;
         }
@@ -619,58 +578,47 @@ class OneallSocialLogin extends Module
         $query = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'oasl_identity` (`id_oasl_identity` int(10) unsigned NOT NULL AUTO_INCREMENT, `id_oasl_user` int(10) unsigned NOT NULL, `identity_token` varchar(48) NOT NULL, `identity_provider` varchar(64) NOT NULL, `num_logins` int(10) unsigned NOT NULL, `date_add` datetime NOT NULL, `date_upd` datetime NOT NULL, PRIMARY KEY (`id_oasl_identity`))';
         if (!Db::getInstance()->execute($query))
         {
-            $this->context->controller->errors[] = "Could not create the table " . _DB_PREFIX_ . "oasl_identity";
+            self::display_error("Could not create the table " . _DB_PREFIX_ . "oasl_identity");
 
             return false;
         }
 
-        // Clean class cache.
-        $class_cache = _PS_CACHE_DIR_ . 'class_index.php';
-        if (file_exists($class_cache))
-        {
-            @unlink($class_cache);
-        }
-
-        // Done
+        //Done
 
         return true;
     }
 
     /**
      * Uninstall
-     */
+     **/
     public function uninstall()
     {
-        // UnInstall
+        //UnInstall
         if (!parent::uninstall())
         {
             return false;
         }
 
-        // Drop user_token table
+        //Drop user_token table
         $query = 'DROP table IF EXISTS `' . _DB_PREFIX_ . 'oasl_user`';
         Db::getInstance()->execute($query);
 
-        // Drop identity_token table
+        //Drop identity_token table
         $query = 'DROP table IF EXISTS `' . _DB_PREFIX_ . 'oasl_identity`';
         Db::getInstance()->execute($query);
 
-        // Get files to remove.
+        // Remove controller files.
         $files = $this->get_files_to_install();
-
-        // Remove files
-        foreach ($files as $file_data)
+        foreach ($files as $file_name => $file_data)
         {
-            if (is_array($file_data) && !empty($file_data['name']) && !empty($file_data['source']) && !empty($file_data['target']))
+            if (is_array($file_data) and !empty($file_data['source']) and !empty($file_data['target']))
             {
-                if (file_exists($file_data['target'] . $file_data['name']))
+                if (file_exists($file_data['target'] . $file_name))
                 {
-                    @unlink($file_data['target'] . $file_data['name']);
+                    @unlink($file_data['target'] . $file_name);
                 }
             }
         }
-
-        return true;
     }
 
     /**
@@ -681,140 +629,100 @@ class OneallSocialLogin extends Module
 
     /**
      * Generic Hook
-     */
+     **/
     protected function hookGeneric($params, $target)
     {
-        global $smarty;
+        global $smarty, $cookie;
 
-        // Load context
-        $this->context = Context::getContext();
-
-        // Do not display for users that are logged in, or for users that are using our controller
-        if (!$this->context->customer->isLogged() and $this->context->controller->php_self != 'oneallsociallogin')
+        //Do not display for users that are logged in
+        if (!$cookie->isLogged())
         {
-            // Default
+            //Default
             $widget_enable = false;
             $widget_location = 'unspecified';
+            $widget_title = '';
 
-            // Check what has to be done
+            //Check what has to be done
             switch ($target)
             {
-                // Customer Account Form
-                case 'customer_account_form':
-                    if (Configuration::get('OASL_JS_HOOK_AUTH_DISABLE') != 1)
-                    {
-                        $widget_enable = true;
-                        $widget_location = $target;
-                    }
-                    break;
-
-                // Left Column
+                //Left Column
                 case 'left_column':
                     if (Configuration::get('OASL_HOOK_LEFT_DISABLE') != 1)
                     {
                         $widget_enable = true;
-                        $widget_location = $target;
+                        $widget_location = 'left';
+                        $widget_title = Configuration::get('OASL_HOOK_LEFT_TITLE');
                     }
                     break;
 
-                // Right Column
+                //Right Column
                 case 'right_column':
                     if (Configuration::get('OASL_HOOK_RIGHT_DISABLE') != 1)
                     {
                         $widget_enable = true;
-                        $widget_location = $target;
+                        $widget_location = 'right';
+                        $widget_title = Configuration::get('OASL_HOOK_RIGHT_TITLE');
                     }
                     break;
 
-                // Right Column
-                case 'displayCustomerLoginFormAfter':
-                    if (Configuration::get('OASL_JS_HOOK_LOGIN_DISABLE') != 1)
-                    {
-                        $widget_enable = true;
-                        $widget_location = $target;
-                    }
-                    break;
-
+                //Right Column
                 case 'custom':
                     $widget_enable = true;
-                    $widget_location = $target;
+                    $widget_location = 'custom';
+                    $widget_title = '';
                     break;
             }
 
-            // Enable this widget?
+            //    Enable this widget?
             if ($widget_enable)
             {
-                // Read Settings
+                //Read Settings
                 $providers = explode(',', trim(Configuration::get('OASL_PROVIDERS')));
                 if (is_array($providers) and count($providers) > 0)
                 {
-                    // Setup placeholders
+                    //Setup placeholders
+                    $smarty->assign('oasl_widget_title', $widget_title);
                     $smarty->assign('oasl_widget_location', $widget_location);
                     $smarty->assign('oasl_widget_rnd', mt_rand(99999, 9999999));
-                    $smarty->assign('oasl_widget_callback', oneall_social_login_tools::get_callback_uri(true));
                     $smarty->assign('oasl_widget_css', '');
-                    $smarty->assign('oasl_widget_providers', '"' . implode('","', $providers) . '"');
+                    $smarty->assign('oasl_widget_providers', implode('","', $providers));
 
-                    // Display template
+                    //Display template
 
-                    return $this->display(__FILE__, 'oneallsociallogin_widget.tpl');
+                    return $this->display(__FILE__, 'oneallsociallogin.tpl');
                 }
             }
         }
     }
 
     /**
-     * Hook: Customer Account Form Top
-     */
-    public function hookDisplayCustomerAccountFormTop($params)
-    {
-        return $this->hookGeneric($params, 'customer_account_form');
-    }
-
-    /**
-     * Hook: Customer Account Form
-     */
-    // public function hookDisplayCustomerAccountForm($params)
-    // {
-    //     return $this->hookGeneric($params, 'customer_account_form');
-    // }
-
-    /**
      * Hook: Left Column
-     */
-    public function hookDisplayLeftColumn($params)
+     **/
+    public function hookLeftColumn($params)
     {
         return $this->hookGeneric($params, 'left_column');
     }
 
     /**
      * Hook: Right Column
-     */
-    public function hookDisplayRightColumn($params)
+     **/
+    public function hookRightColumn($params)
     {
         return $this->hookGeneric($params, 'right_column');
     }
 
     /**
-     * Hook: Right Column
-     */
-    public function hookDisplayCustomerLoginFormAfter($params)
-    {
-        return $this->hookGeneric($params, 'displayCustomerLoginFormAfter');
-    }
-
-    /**
      * Hook: Header (Library)
-     */
-    public function hookDisplayHeader($params)
+     **/
+    public function hookHeader($params)
     {
-        // Output
+        //Output
         $output = '';
 
-        // Read API Credentials
+        //Read API Credentials
         $api_subdomain = Configuration::get('OASL_API_SUBDOMAIN');
 
-        // Subdomain is required
+        //Subdomain is required
         if (!empty($api_subdomain))
         {
             global $smarty;
@@ -824,26 +732,8 @@ class OneallSocialLogin extends Module
 
             // Add the OneAll Social Library.
             $smarty->assign('oasl_widget_location', 'library');
-
-            $smarty->assign('oasl_auth_disable', (Configuration::get('OASL_JS_HOOK_AUTH_DISABLE') == 1 ? 1 : 0));
-
             $smarty->assign('oasl_subdomain', $api_subdomain);
-            $smarty->assign('oasl_widget_rnd', mt_rand(99999, 9999999));
-
-            // Store providers
-            $providers = explode(',', trim(Configuration::get('OASL_PROVIDERS')));
-            if (is_array($providers) and count($providers) > 0)
-            {
-                $smarty->assign('oasl_widget_providers', "'" . implode(",", $providers) . "'");
-                $smarty->assign('oasl_widget_providers_array', $providers);
-            }
-
-            // Add Our JavaScript/CSS
-            $this->context->controller->registerJavascript($this->name . '.js', $this->_path . 'views/js/' . $this->name . '.js', ['position' => 'bottom', 'priority' => 8000]);
-            $this->context->controller->registerStylesheet($this->name . '.css', $this->_path . 'views/css/' . $this->name . '.css', ['position' => 'bottom', 'priority' => 8000]);
-
-            // Read library
-            $output .= $this->display(__FILE__, 'oneallsociallogin_widget.tpl');
+            $output .= $this->display(__FILE__, 'oneallsociallogin.tpl');
         }
 
         return $output;
@@ -851,23 +741,22 @@ class OneallSocialLogin extends Module
 
     /**
      * Hook: Page Top (Callback)
-     */
-    public function hookDisplayTop()
+     **/
+    public function hookTop()
     {
-        // Load the context.
-        $this->context = Context::getContext();
+        global $cookie;
 
         // Only of the user is not logged in.
-        if (!$this->context->customer->isLogged())
+        if (!$cookie->isLogged())
         {
             // Check for callback arguments.
-            if (Tools::getIsset('oa_action') === true && Tools::getIsset('connection_token') === true)
+            if (Tools::getIsset('oa_action') === true and Tools::getIsset('connection_token') === true)
             {
                 // Extract the callback arguments.
                 $oa_action = trim(Tools::getValue('oa_action'));
                 $connection_token = trim(Tools::getValue('connection_token'));
 
-                // Verify arguments
+                //Verify arguments
                 if ($oa_action == 'social_login' and strlen($connection_token) > 0)
                 {
                     // Read the API credentials.
@@ -892,11 +781,8 @@ class OneallSocialLogin extends Module
                     // Retrieve connection details.
                     $result = oneall_social_login_tools::do_api_request($api_handler, $api_resource, $api_params, 15);
 
-                    // Parse data.
-                    $data = oneall_social_login_tools::extract_social_network_profile($result);
-
-                    // Handle data.
-                    if (is_array($data))
+                    // Extract the social data.
+                    if (is_array(($data = oneall_social_login_tools::extract_social_network_profile($result))))
                     {
                         // Get the customer identifier for a given token.
                         $id_customer_tmp = oneall_social_login_tools::get_id_customer_for_user_token($data['user_token']);
@@ -936,18 +822,21 @@ class OneallSocialLogin extends Module
                             }
                         }
 
-                        // Create a new user account.
+                        // Create a user new account.
                         if (empty($id_customer))
                         {
                             // Notify the customer ?
                             $customer_email_notify = true;
+
+                            // Redirection url.
+                            $redirect_to = rtrim(Tools::getShopDomainSsl(true), ' /') . '/oneallsociallogin.php?back=' . urlencode(oneall_social_login_tools::get_current_url());
 
                             // How do we have to proceed?
                             switch (Configuration::get('OASL_DATA_HANDLING'))
                             {
                                 // Automatic Completion.
                                 case 'auto':
-                                    // Generate a random email if none is provided or if it's already taken.
+                                    // Generate a random email none is provided or if it's already taken.
                                     if (empty($data['user_email']) or oneall_social_login_tools::get_id_customer_for_email_address($data['user_email']) !== false)
                                     {
                                         // Generate a random email.
@@ -968,53 +857,28 @@ class OneallSocialLogin extends Module
                                     {
                                         $data['user_first_name'] = 'John';
                                     }
-                                break;
+                                    break;
 
-                                // Ask for manual completion if any of the fields is empty or if the email is already taken.
+                                //Ask for manual completion if any of the fields is empty or if the email is already taken.
                                 case 'ask':
-                                    if (empty($data['user_email']) || empty($data['user_first_name']) || empty($data['user_last_name']) || oneall_social_login_tools::get_id_customer_for_email_address($data['user_email']) !== false)
+                                    if (empty($data['user_email']) or empty($data['user_first_name']) or empty($data['user_last_name']) or oneall_social_login_tools::get_id_customer_for_email_address($data['user_email']) !== false)
                                     {
-                                    	// To which URL shall the user return to?
-                                    	$return_to = trim (Tools::getValue('return_to'));
-                                    	if (empty ($return_to))
-                                    	{
-                                    		$return_to = oneall_social_login_tools::get_current_url();
-                                    	}
-
-                                    	// Add to cookie data
-                                    	$data['return_to'] = $return_to;
-
                                         // Save the data in the session.
-                                        $this->context->cookie->oasl_data = base64_encode (serialize ($data));
-                                        $this->context->cookie->write();
+                                        $cookie->oasl_data = @serialize($data);
 
-                                        // Redirect to the Social Login registration form
-                                        header('Location: ' . $this->context->link->getModuleLink($this->name, 'register'));
-                                        exit();
+                                        //Redirect to the request form
+                                        Tools::redirectLink($redirect_to);
                                     }
-                                break;
+                                    break;
 
-                                // Always verify the fields
+                                //Always verify the fields
                                 default:
-
-                                	// To which URL shall the user return to?
-                                	$return_to = trim (Tools::getValue('return_to'));
-                                	if (empty ($return_to))
-                                	{
-                                		$return_to = oneall_social_login_tools::get_current_url();
-                                	}
-
-                                	// Add to cookie data
-                                	$data['return_to'] = $return_to;
-
                                     // Save the data in the session.
-                                    $this->context->cookie->oasl_data = base64_encode(serialize($data));
-                                    $this->context->cookie->write();
+                                    $cookie->oasl_data = @serialize($data);
 
-                                     // Redirect to the Social Login registration form
-                                    header('Location: ' . $this->context->link->getModuleLink($this->name, 'register'));
-                                    exit();
-                                break;
+                                    //Redirect to the request form
+                                    Tools::redirectLink($redirect_to);
+                                    break;
                             }
 
                             // Email flags.
@@ -1026,23 +890,18 @@ class OneallSocialLogin extends Module
                         }
 
                         // Login.
-                        if (!empty($id_customer) && oneall_social_login_tools::login_customer($id_customer))
+                        if (!empty($id_customer) and oneall_social_login_tools::login_customer($id_customer))
                         {
-                            // To which URL shall the user return to?
-                            $return_to = trim (Tools::getValue('return_to'));
-                            if (empty ($return_to))
+                            //Remove the data (Should not be set here)
+                            if (isset($cookie->oasl_data))
                             {
-                            	$return_to = oneall_social_login_tools::get_current_url();
+                                unset($cookie->oasl_data);
                             }
 
-                            // Remove Social Login Cookie
-                            if (isset($this->context->cookie->oasl_data))
-                            {
-                                unset($this->context->cookie->oasl_data);
-                            }
-
-                            // Redirect
-                            Tools::redirect($return_to);
+                            //A refresh is required to update the page
+                            $back = trim(Tools::getValue('back'));
+                            $back = (!empty($back) ? $back : oneall_social_login_tools::get_current_url());
+                            Tools::redirectLink($back);
                         }
                     }
                 }

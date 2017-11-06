@@ -1,7 +1,7 @@
 <?php
 /**
  * @package       OneAll Social Login
- * @copyright     Copyright 2011-2017 http://www.oneall.com
+ * @copyright     Copyright 2012 http://www.oneall.com - All rights reserved.
  * @license       GNU/GPL 2 or later
  *
  * This program is free software; you can redistribute it and/or
@@ -26,13 +26,15 @@
 //OneAll Social Login Toolbox
 class oneall_social_login_tools
 {
-    const USER_AGENT = 'SocialLogin/1.2 PrestaShop/1.7.x.x (+http://www.oneall.com/)';
+    const USER_AGENT = 'SocialLogin/1.1.0 PrestaShop/1.4.x.x (+http://www.oneall.com/)';
 
     /**
      * Logs a given customer in.
      */
     public static function login_customer($id_customer)
     {
+        global $cart, $cookie;
+
         // Make sure that that the customers exists.
         $sql = "SELECT * FROM `" . _DB_PREFIX_ . "customer` WHERE `id_customer` = '" . pSQL($id_customer) . "'";
         $result = Db::getInstance()->GetRow($sql);
@@ -51,48 +53,31 @@ class oneall_social_login_tools
                 }
             }
 
-            // See => AuthControllerCore::processSubmitLogin
-            Hook::exec('actionBeforeAuthentication');
+            // See => AuthControllerCore
+            Module::hookExec('beforeAuthentication');
 
-            $context = Context::getContext();
-            $context->cookie->id_customer = (int) ($customer->id);
-            $context->cookie->customer_lastname = $customer->lastname;
-            $context->cookie->customer_firstname = $customer->firstname;
-            $context->cookie->logged = 1;
-            $context->cookie->is_guest = $customer->isGuest();
-            $context->cookie->passwd = $customer->passwd;
-            $context->cookie->email = $customer->email;
+            $cookie->id_compare = isset($cookie->id_compare) ? $cookie->id_compare : CompareProduct::getIdCompareByIdCustomer($customer->id);
+            $cookie->id_customer = (int) ($customer->id);
+            $cookie->customer_lastname = $customer->lastname;
+            $cookie->customer_firstname = $customer->firstname;
+            $cookie->passwd = $customer->passwd;
+            $cookie->logged = 1;
+            $cookie->email = $customer->email;
+            $cookie->is_guest = $customer->isGuest();
 
-            // Customer is logged in
-            $customer->logged = 1;
-
-            // Add customer to the context
-            $context->customer = $customer;
-
-            if (Configuration::get('PS_CART_FOLLOWING') && (empty($context->cookie->id_cart) || Cart::getNbProducts($context->cookie->id_cart) == 0) && $id_cart = (int) Cart::lastNoneOrderedCart($context->customer->id))
+            if (Configuration::get('PS_CART_FOLLOWING') and (empty($cookie->id_cart) or Cart::getNbProducts($cookie->id_cart) == 0))
             {
-                $context->cart = new Cart($id_cart);
+                $cookie->id_cart = (int) (Cart::lastNoneOrderedCart((int) ($customer->id)));
             }
-            else
-            {
-                $context->cart->id_carrier = 0;
-                $context->cart->setDeliveryOption(null);
-                $context->cart->id_address_delivery = Address::getFirstCustomerAddressId((int) ($customer->id));
-                $context->cart->id_address_invoice = Address::getFirstCustomerAddressId((int) ($customer->id));
-            }
-            $context->cart->id_customer = (int) $customer->id;
-            $context->cart->secure_key = $customer->secure_key;
-            $context->cart->save();
 
-            $context->cookie->id_cart = (int) $context->cart->id;
-            $context->cookie->update();
-            $context->cart->autosetProductAddress();
+            // Update cart address.
+            $cart->id_carrier = 0;
+            $cart->id_address_delivery = Address::getFirstCustomerAddressId((int) ($customer->id));
+            $cart->id_address_invoice = Address::getFirstCustomerAddressId((int) ($customer->id));
+            $cart->secure_key = $customer->secure_key;
+            $cart->update();
 
-            Hook::exec('actionAuthentication');
-
-            // Login information have changed, so we check if the cart rules still apply
-            CartRule::autoRemoveFromCart($context);
-            CartRule::autoAddToCart($context);
+            Module::hookExec('authentication');
 
             // Customer is now logged in.
 
@@ -124,18 +109,6 @@ class oneall_social_login_tools
             $customer->is_guest = false;
             $customer->passwd = Tools::encrypt($password);
 
-            //Opted for the newsletter?
-            if (!empty($data['user_newsletter']))
-            {
-                $customer->ip_registration_newsletter = pSQL(Tools::getRemoteAddr());
-                $customer->newsletter_date_add = pSQL(date('Y-m-d H:i:s'));
-                $customer->newsletter = true;
-            }
-            else
-            {
-                $customer->newsletter = false;
-            }
-
             // We could get the email.
             if (!empty($data['user_email']))
             {
@@ -149,6 +122,7 @@ class oneall_social_login_tools
                 else
                 {
                     $customer->email = $data['user_email'];
+                    $customer->newsletter = true;
                 }
             }
             // We could not get the email.
@@ -165,28 +139,16 @@ class oneall_social_login_tools
                 // Tie the tokens to the newly created member.
                 if (self::link_tokens_to_id_customer($customer->id, $data['user_token'], $data['identity_token'], $data['identity_provider']))
                 {
-                    //Send an email to the customer.
+                    //Send an email to the customer
                     if ($send_email_to_customer === true)
                     {
                         self::send_confirmation_to_customer($customer, $password, $data['identity_provider']);
                     }
 
-                    //Send an email to the administrators
+                    //Send an email to the administratos
                     if ($send_email_to_admin === true)
                     {
                         self::send_confirmation_to_administrators($customer, $data['identity_provider']);
-                    }
-
-                    //Process the newletter settings
-                    if ($customer->newsletter === true)
-                    {
-                        if ($module_newsletter = Module::getInstanceByName('blocknewsletter'))
-                        {
-                            if ($module_newsletter->active)
-                            {
-                                $module_newsletter->confirmSubscription($customer->email);
-                            }
-                        }
                     }
 
                     //Done
@@ -316,35 +278,48 @@ class oneall_social_login_tools
     /**
      * Sends a confirmation to the administrators.
      */
-    public static function send_confirmation_to_administrators($customer, $identity_provider)
+    public static function send_confirmation_to_administrators($customer, $identity_provider, $language_id_force = null)
     {
         // Get the language identifier.
-        $context = Context::getContext();
-        $language_id = $context->language->id;
+        $language_id = (int) _PS_LANG_DEFAULT_;
+        $language_code = Language::getIsoById($language_id);
+
+        // Check if the specific language template exists.
+        if (!file_exists(_PS_THEME_DIR_ . '/mails/' . $language_code . '/oneallsociallogin.txt'))
+        {
+            // Does not exist, try to send in english.
+            $language_id_english = Language::getIdByIso('en');
+
+            // Prevent loops.
+            if (is_numeric($language_id_english) and $language_id_english != $language_id_force)
+            {
+                return self::send_confirmation_to_administrators($customer, $identity_provider, $language_id_english);
+            }
+
+            return false;
+        }
 
         // Setup the mail title.
-        $mail_title = "A new customer has registered with Social Login";
+        $mail_title = Mail::l("A new customer has registered with Social Login", $language_id);
 
         // Setup the mail vars.
         $mail_vars = array();
-        $mail_vars['{message}'] = "Customer Details:<br />";
-        $mail_vars['{message}'] .= " Identifier: " . $customer->id . "<br />";
-        $mail_vars['{message}'] .= " First name: " . $customer->firstname . "<br />";
-        $mail_vars['{message}'] .= " Last name: " . $customer->lastname . "<br />";
-        $mail_vars['{message}'] .= " Email: " . $customer->email . "<br />";
-        $mail_vars['{message}'] .= " Signed up with: " . $identity_provider . "<br />";
-        $mail_vars['{email}'] = $customer->email;
+        $mail_vars['{message}'] = Mail::l('Customer Details', $language_id) . ':<br />';
+        $mail_vars['{message}'] .= ' ' . Mail::l('Identifier', $language_id) . ': ' . $customer->id . '<br />';
+        $mail_vars['{message}'] .= ' ' . Mail::l('First name', $language_id) . ': ' . $customer->firstname . '<br />';
+        $mail_vars['{message}'] .= ' ' . Mail::l('Last name', $language_id) . ': ' . $customer->lastname . '<br />';
+        $mail_vars['{message}'] .= ' ' . Mail::l('Email', $language_id) . ': ' . $customer->email . '<br />';
+        $mail_vars['{message}'] .= ' ' . Mail::l('Signed up with', $language_id) . ': ' . $identity_provider . '<br />';
 
-        //Read the first employe - should be the board owner
-        $employees = Employee::getEmployeesByProfile(_PS_ADMIN_PROFILE_, true);
-        foreach ($employees as $employee)
+        //Read employees
+        $sql = "SELECT `firstname`, `lastname`, `email` FROM `" . _DB_PREFIX_ . "employee` WHERE `id_profile`=1";
+        $employees = Db::getInstance()->ExecuteS($sql);
+        if (is_array($employees) and count($employees) > 0)
         {
-            //Employee Details
-            $mail_vars['{firstname}'] = $employee['firstname'];
-            $mail_vars['{lastname}'] = $employee['lastname'];
-
-            //Send Mail
-            @Mail::Send($language_id, 'contact', $mail_title, $mail_vars, $employee['email'], $employee['firstname'] . ' ' . $employee['lastname']);
+            foreach ($employees as $employee)
+            {
+                @Mail::Send($language_id, 'contact', $mail_title, $mail_vars, $employee['email'], $employee['firstname'] . ' ' . $customer->lastname);
+            }
         }
 
         //Done
@@ -355,11 +330,26 @@ class oneall_social_login_tools
     /**
      * Sends a confirmation to the given customer.
      */
-    public static function send_confirmation_to_customer($customer, $password, $identity_provider)
+    public static function send_confirmation_to_customer($customer, $password, $identity_provider, $language_id_force = null)
     {
         // Get the language identifier.
-        $context = Context::getContext();
-        $language_id = $context->language->id;
+        $language_id = (int) _PS_LANG_DEFAULT_;
+        $language_code = Language::getIsoById($language_id);
+
+        // Check if the specific language template exists.
+        if (!file_exists(_PS_THEME_DIR_ . '/mails/' . $language_code . '/oneallsociallogin.txt'))
+        {
+            // Does not exist, try to send in english.
+            $language_id_english = Language::getIdByIso('en');
+
+            // Prevent loops.
+            if (is_numeric($language_id_english) and $language_id_english != $language_id_force)
+            {
+                return self::send_confirmation_to_customer($customer, $password, $identity_provider, $language_id_english);
+            }
+
+            return false;
+        }
 
         // Setup the mail vars.
         $mail_vars = array();
@@ -461,8 +451,9 @@ class oneall_social_login_tools
                 // Parse Social Profile Data.
                 $identity = $social_data->response->result->data->user->identity;
 
-                $data['identity_provider'] = $identity->source->name;
                 $data['identity_token'] = $identity->identity_token;
+                $data['identity_provider'] = $identity->source->name;
+
                 $data['user_token'] = $social_data->response->result->data->user->user_token;
                 $data['user_first_name'] = !empty($identity->name->givenName) ? $identity->name->givenName : '';
                 $data['user_last_name'] = !empty($identity->name->familyName) ? $identity->name->familyName : '';
@@ -472,42 +463,16 @@ class oneall_social_login_tools
                 $data['user_thumbnail'] = !empty($identity->thumbnailUrl) ? $identity->thumbnailUrl : '';
                 $data['user_about_me'] = !empty($identity->aboutMe) ? $identity->aboutMe : '';
 
-                // Default birthdate
-                $data['user_birthdate'] = '0000-00-00';
-
-                // Birthdate
-                if (!empty($identity->birthday) && preg_match('/^([0-9]{1,2})\/([0-9]{1,2})\/([0-9]{4})$/', $identity->birthday, $matches))
+                // Birthdate - SMF expects YYYY-DD-MM
+                if (!empty($identity->birthday) && preg_match('/^([0-9]{2})\/([0-9]{2})\/([0-9]{4})$/', $identity->birthday, $matches))
                 {
-                    //setup birthdate
-                    $birthdate = $matches[3];
-                    $birthdate .= '-' . str_pad($matches[2], 2, '0', STR_PAD_LEFT);
-                    $birthdate .= '-' . str_pad($matches[1], 2, '0', STR_PAD_LEFT);
-
-                    //PrestaShop birthday checker
-                    if (Validate::isBirthDate($birthdate))
-                    {
-                        $data['user_birthdate'] = $birthdate;
-                    }
+                    $data['user_birthdate'] = str_pad($matches[3], 4, '0', STR_PAD_LEFT);
+                    $data['user_birthdate'] .= '-' . str_pad($matches[2], 2, '0', STR_PAD_LEFT);
+                    $data['user_birthdate'] .= '-' . str_pad($matches[1], 2, '0', STR_PAD_LEFT);
                 }
-
-                // Accounts
-                if (isset($identity->accounts) and is_array($identity->accounts))
+                else
                 {
-                    $data['accounts'] = array();
-
-                    foreach ($identity->accounts as $identity_account)
-                    {
-                        $properties = get_object_vars($identity_account);
-                        if (is_array($properties) and count($properties) > 0)
-                        {
-                            $account = array();
-                            foreach ($properties as $property => $property_value)
-                            {
-                                $account[$property] = $property_value;
-                            }
-                            $data['accounts'][] = $account;
-                        }
-                    }
+                    $data['user_birthdate'] = '0000-00-00';
                 }
 
                 // Fullname.
@@ -749,7 +714,7 @@ class oneall_social_login_tools
 
         //Create HTTP request
         $defaults = array(
-            'Host' => 'Host: ' . $host,
+            'Host' => "Host: $host",
             'User-Agent' => 'User-Agent: ' . self::USER_AGENT
         );
 
@@ -792,48 +757,6 @@ class oneall_social_login_tools
     }
 
     /**
-     * Returns the callback URI
-     */
-    public static function get_callback_uri($include_return_to_param = false, $remove_back_param = true)
-    {
-    	// Current URL
-    	$current_url = self::get_current_url();
-
-    	// Remove the back parameter?
-    	if ($remove_back_param)
-    	{
-	    	if (strpos ($current_url, 'back') !== false)
-	    	{
-	    		//Break up url
-	    		list($url_part, $query_part) = array_pad (explode ('?', $current_url), 2, '');
-	    		parse_str ($query_part, $query_vars);
-
-	    		//Remove oa_social_login_source argument
-	    		if (is_array ($query_vars) && isset ($query_vars ['back']))
-	    		{
-	    			unset ($query_vars ['back']);
-	    		}
-
-	    		//Build new url
-	    		$current_url = $url_part . ((is_array ($query_vars) && count ($query_vars) > 0) ? ('?' . http_build_query ($query_vars)) : '');
-	    	}
-    	}
-
-    	// Build callback uri
-    	$callback_uri = Tools::getHttpHost(true) . __PS_BASE_URI__;
-
-    	// Add return_to parameter?
-    	if ($include_return_to_param)
-    	{
-    		$callback_uri .= (parse_url($callback_uri, PHP_URL_QUERY) ? '&' : '?');
-    		$callback_uri .= 'return_to='.urlencode ($current_url);
-    	}
-
-    	// Done
-    	return $callback_uri;
-    }
-
-    /**
      * Returns the current url
      */
     public static function get_current_url()
@@ -865,6 +788,7 @@ class oneall_social_login_tools
         $current_url = $request_protocol . '://' . $request_host . (!empty($request_port) ? (':' . $request_port) : '') . $request_uri;
 
         //Done
+
         return $current_url;
     }
 
