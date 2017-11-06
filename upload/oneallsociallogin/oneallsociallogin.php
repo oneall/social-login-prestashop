@@ -495,10 +495,10 @@ class OneallSocialLogin extends Module
      **/
     public function install()
     {
-        // Check PS version compliancy (Needs to be lower or equal to 1.4.9)
-        if (!version_compare(_PS_VERSION_, '1.4.9', '<='))
+        // Check PS version compliancy (Needs to be lower or equal to 1.5)
+        if (!version_compare(_PS_VERSION_, '1.5', '<'))
         {
-            self::display_error('This version of Social Login can only be used with PrestaShop 1.4.9 or less, your version of PrestaShop is: ' . _PS_VERSION_);
+            self::display_error('This version of Social Login can only be used with PrestaShop 1.4.x, your version of PrestaShop is: ' . _PS_VERSION_);
 
             return false;
         }
