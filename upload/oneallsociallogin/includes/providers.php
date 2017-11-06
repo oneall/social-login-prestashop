@@ -1,8 +1,8 @@
 <?php
 /**
- * @package   	OneAll Social Login
- * @copyright 	Copyright 2012 http://www.oneall.com - All rights reserved.
- * @license   	GNU/GPL 2 or later
+ * @package       OneAll Social Login
+ * @copyright     Copyright 2012 http://www.oneall.com - All rights reserved.
+ * @license       GNU/GPL 2 or later
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -26,87 +26,85 @@
 //OneAll Social Login Provider List
 class oneall_social_login_providers
 {
-	/**
-	 * Checks if a given provider key is valid.
-	 */
-	public static function is_valid_key ($key)
-	{
-		$providers = self::get_list ();
-		return isset ($providers [$key]);
-	}
+    /**
+     * Checks if a given provider key is valid.
+     */
+    public static function is_valid_key($key)
+    {
+        $providers = self::get_list();
 
-	/**
-	 * Returns a list of providers that are available.
-	 */
-	public static function get_list ()
-	{
-		return array (
-			'facebook' => array (
-				'name' => 'Facebook'
-			),
-			'twitter' => array (
-				'name' => 'Twitter'
-			),
-			'google' => array (
-				'name' => 'Google'
-			),
-			'linkedin' => array (
-				'name' => 'LinkedIn'
-			),
-			'yahoo' => array (
-				'name' => 'Yahoo'
-			),
-			'github' => array (
-				'name' => 'Github.com'
-			),
-			'foursquare' => array (
-				'name' => 'Foursquare'
-			),
-			'youtube' => array (
-				'name' => 'YouTube'
-			),
-			'skyrock' => array (
-				'name' => 'Skyrock.com'
-			),
-			'openid' => array (
-				'name' => 'OpenID'
-			),
-			'wordpress' => array (
-				'name' => 'Wordpress.com'
-			),
-			'hyves' => array (
-				'name' => 'Hyves'
-			),
-			'paypal' => array (
-				'name' => 'PayPal'
-			),
-			'livejournal' => array (
-				'name' => 'LiveJournal'
-			),
-			'steam' => array (
-				'name' => 'Steam Community'
-			),
-			'windowslive' => array (
-				'name' => 'Windows Live'
-			),
-			'blogger' => array (
-				'name' => 'Blogger'
-			),
-			'disqus' => array (
-				'name' => 'Disqus'
-			),
-			'stackexchange' => array (
-				'name' => 'StackExchange'
-			),
-			'vkontakte' => array (
-				'name' => 'VKontakte (Вконтакте)'
-			),
-			'odnoklassniki' => array (
-				'name' => 'Odnoklassniki.ru'
-			),
-			'mailru' => array (
-				'name' => 'Mail.ru'
-			)
-		);
-	}
+        return isset($providers[$key]);
+    }
+
+    /**
+     * Returns a list of providers that are available.
+     */
+    public static function get_list()
+    {
+        return array(
+            'blogger' => array(
+                'name' => 'Blogger'
+            ),
+            'disqus' => array(
+                'name' => 'Disqus'
+            ),
+            'facebook' => array(
+                'name' => 'Facebook'
+            ),
+            'foursquare' => array(
+                'name' => 'Foursquare'
+            ),
+            'github' => array(
+                'name' => 'Github.com'
+            ),
+            'google' => array(
+                'name' => 'Google'
+            ),
+            'linkedin' => array(
+                'name' => 'LinkedIn'
+            ),
+            'livejournal' => array(
+                'name' => 'LiveJournal'
+            ),
+            'mailru' => array(
+                'name' => 'Mail.ru'
+            ),
+            'odnoklassniki' => array(
+                'name' => 'Odnoklassniki.ru'
+            ),
+            'openid' => array(
+                'name' => 'OpenID'
+            ),
+            'paypal' => array(
+                'name' => 'PayPal'
+            ),
+            'skyrock' => array(
+                'name' => 'Skyrock.com'
+            ),
+            'stackexchange' => array(
+                'name' => 'StackExchange'
+            ),
+            'steam' => array(
+                'name' => 'Steam Community'
+            ),
+            'twitter' => array(
+                'name' => 'Twitter'
+            ),
+            'vkontakte' => array(
+                'name' => 'VKontakte (Вконтакте)'
+            ),
+            'windowslive' => array(
+                'name' => 'Windows Live'
+            ),
+            'wordpress' => array(
+                'name' => 'Wordpress.com'
+            ),
+            'yahoo' => array(
+                'name' => 'Yahoo'
+            ),
+            'youtube' => array(
+                'name' => 'YouTube'
+            )
+        );
+    }
 }

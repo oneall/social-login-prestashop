@@ -220,7 +220,7 @@ class OneallSocialLogin extends Module
 			<link type="text/css" href="' . (__PS_BASE_URI__) . 'modules/' . $this->name . '/assets/css/admin.css" rel="stylesheet"></link>
 			<h2>' . $this->l('OneAll Social Login') . '</h2>
 			<p>
-				' . $this->l('Allow your visitors to comment, login and register with 20+ Social Networks like for example Twitter, Facebook, LinkedIn, Hyves, VKontakte, Google or Yahoo.') . '
+				' . $this->l('Allow your visitors to comment, login and register with 20+ Social Networks like for example Twitter, Facebook, LinkedIn, VKontakte, Google or Yahoo.') . '
 				' . $this->l('Draw a larger audience and increase your user engagement and conversion rates in a few simple steps.') . '
 			</p>
 		<div class="oasl_box">
