@@ -42,11 +42,26 @@ class oneall_social_login_providers
     public static function get_list()
     {
         return array(
+            'amazon' => array(
+                'name' => 'Amazon'
+            ),
+            'battlenet' => array(
+                'name' => 'Battle.net'
+            ),
             'blogger' => array(
                 'name' => 'Blogger'
             ),
+            'discord' => array(
+                'name' => 'Discord'
+            ),
             'disqus' => array(
                 'name' => 'Disqus'
+            ),
+            'draugiem' => array(
+                'name' => 'Draugiem'
+            ),
+            'dribbble' => array(
+                'name' => 'Dribbble'
             ),
             'facebook' => array(
                 'name' => 'Facebook'
@@ -60,6 +75,12 @@ class oneall_social_login_providers
             'google' => array(
                 'name' => 'Google'
             ),
+            'instagram' => array(
+                'name' => 'Instagram'
+            ),
+            'line' => array(
+                'name' => 'Line'
+            ),
             'linkedin' => array(
                 'name' => 'LinkedIn'
             ),
@@ -68,6 +89,9 @@ class oneall_social_login_providers
             ),
             'mailru' => array(
                 'name' => 'Mail.ru'
+            ),
+            'meetup' => array(
+                'name' => 'Meetup'
             ),
             'odnoklassniki' => array(
                 'name' => 'Odnoklassniki.ru'
@@ -78,8 +102,20 @@ class oneall_social_login_providers
             'paypal' => array(
                 'name' => 'PayPal'
             ),
+            'pinterest' => array(
+                'name' => 'Pinterest'
+            ),
+            'pixelpin' => array(
+                'name' => 'PixelPin'
+            ),
+            'reddit' => array(
+                'name' => 'Reddit'
+            ),
             'skyrock' => array(
                 'name' => 'Skyrock.com'
+            ),
+            'soundcloud' => array(
+                'name' => 'SoundCloud'
             ),
             'stackexchange' => array(
                 'name' => 'StackExchange'
@@ -87,17 +123,32 @@ class oneall_social_login_providers
             'steam' => array(
                 'name' => 'Steam Community'
             ),
+            'tumblr' => array(
+                'name' => 'Tumblr'
+            ),
+            'twitch' => array(
+                'name' => 'Twitch.tv'
+            ),
             'twitter' => array(
                 'name' => 'Twitter'
             ),
+            'vimeo' => array(
+                'name' => 'Vimeo'
+            ),
             'vkontakte' => array(
                 'name' => 'VKontakte (Вконтакте)'
+            ),
+            'weibo' => array(
+                'name' => 'Weibo'
             ),
             'windowslive' => array(
                 'name' => 'Windows Live'
             ),
             'wordpress' => array(
                 'name' => 'Wordpress.com'
+            ),
+            'xing' => array(
+                'name' => 'Xing'
             ),
             'yahoo' => array(
                 'name' => 'Yahoo'
