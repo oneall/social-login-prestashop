@@ -1,8 +1,8 @@
 <?php
 /**
- * @package   	OneAll Social Login
- * @copyright 	Copyright 2011-2017 http://www.oneall.com
- * @license   	GNU/GPL 2 or later
+ * @package       OneAll Social Login
+ * @copyright     Copyright 2011-2017 http://www.oneall.com
+ * @license       GNU/GPL 2 or later
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -26,101 +26,138 @@
 //OneAll Social Login Provider List
 class oneall_social_login_providers
 {
-	/**
-	 * Checks if a given provider key is valid.
-	 */
-	public static function is_valid_key ($key)
-	{
-		$providers = self::get_list ();
-		return isset ($providers [$key]);
-	}
+    /**
+     * Checks if a given provider key is valid.
+     */
+    public static function is_valid_key($key)
+    {
+        $providers = self::get_list();
 
-	/**
-	 * Returns a list of providers that are available.
-	 */
-	public static function get_list ()
-	{
-		$providers = array (
-			'amazon' => array (
-				'name' => 'Amazon'
-			),
-			'blogger' => array (
-				'name' => 'Blogger'
-			),
-			'disqus' => array (
-				'name' => 'Disqus'
-			),
-			'facebook' => array (
-				'name' => 'Facebook'
-			),
-			'foursquare' => array (
-				'name' => 'Foursquare'
-			),
-			'github' => array (
-				'name' => 'Github.com'
-			),
-			'google' => array (
-				'name' => 'Google'
-			),
-			'instagram' => array (
-				'name' => 'Instagram'
-			),
-			'linkedin' => array (
-				'name' => 'LinkedIn'
-			),
-			'livejournal' => array (
-				'name' => 'LiveJournal'
-			),
-			'mailru' => array (
-				'name' => 'Mail.ru'
-			),
-			'odnoklassniki' => array (
-				'name' => 'Odnoklassniki'
-			),
-			'openid' => array (
-				'name' => 'OpenID'
-			),
-			'paypal' => array (
-				'name' => 'PayPal'
-			),
-			'reddit' => array (
-				'name' => 'Reddit'
-			),
-			'skyrock' => array (
-				'name' => 'Skyrock.com'
-			),
-			'stackexchange' => array (
-				'name' => 'StackExchange'
-			),
-			'steam' => array (
-				'name' => 'Steam'
-			),
-			'twitch' => array (
-				'name' => 'Twitch.tv'
-			),
-			'twitter' => array (
-				'name' => 'Twitter'
-			),
-			'vimeo' => array (
-				'name' => 'Vimeo'
-			),
-			'vkontakte' => array (
-				'name' => 'VKontakte'
-			),
-			'windowslive' => array (
-				'name' => 'Windows Live'
-			),
-			'wordpress' => array (
-				'name' => 'WordPress.com'
-			),
-			'yahoo' => array (
-				'name' => 'Yahoo'
-			),
-			'youtube' => array (
-				'name' => 'YouTube'
-			),
-		);
+        return isset($providers[$key]);
+    }
 
-		return $providers;
-	}
+    /**
+     * Returns a list of providers that are available.
+     */
+    public static function get_list()
+    {
+        $providers = array(
+            'amazon' => array(
+                'name' => 'Amazon'
+            ),
+            'battlenet' => array(
+                'name' => 'Battle.net'
+            ),
+            'blogger' => array(
+                'name' => 'Blogger'
+            ),
+            'discord' => array(
+                'name' => 'Discord'
+            ),
+            'disqus' => array(
+                'name' => 'Disqus'
+            ),
+            'draugiem' => array(
+                'name' => 'Draugiem'
+            ),
+            'dribbble' => array(
+                'name' => 'Dribbble'
+            ),
+            'facebook' => array(
+                'name' => 'Facebook'
+            ),
+            'foursquare' => array(
+                'name' => 'Foursquare'
+            ),
+            'github' => array(
+                'name' => 'Github.com'
+            ),
+            'google' => array(
+                'name' => 'Google'
+            ),
+            'instagram' => array(
+                'name' => 'Instagram'
+            ),
+            'line' => array(
+                'name' => 'Line'
+            ),
+            'linkedin' => array(
+                'name' => 'LinkedIn'
+            ),
+            'livejournal' => array(
+                'name' => 'LiveJournal'
+            ),
+            'mailru' => array(
+                'name' => 'Mail.ru'
+            ),
+            'meetup' => array(
+                'name' => 'Meetup'
+            ),
+            'odnoklassniki' => array(
+                'name' => 'Odnoklassniki'
+            ),
+            'openid' => array(
+                'name' => 'OpenID'
+            ),
+            'paypal' => array(
+                'name' => 'PayPal'
+            ),
+            'pinterest' => array(
+                'name' => 'Pinterest'
+            ),
+            'pixelpin' => array(
+                'name' => 'PixelPin'
+            ),
+            'reddit' => array(
+                'name' => 'Reddit'
+            ),
+            'skyrock' => array(
+                'name' => 'Skyrock.com'
+            ),
+            'soundcloud' => array(
+                'name' => 'SoundCloud'
+            ),
+            'stackexchange' => array(
+                'name' => 'StackExchange'
+            ),
+            'steam' => array(
+                'name' => 'Steam'
+            ),
+            'tumblr' => array(
+                'name' => 'Tumblr'
+            ),
+            'twitch' => array(
+                'name' => 'Twitch.tv'
+            ),
+            'twitter' => array(
+                'name' => 'Twitter'
+            ),
+            'vimeo' => array(
+                'name' => 'Vimeo'
+            ),
+            'vkontakte' => array(
+                'name' => 'VKontakte'
+            ),
+            'weibo' => array(
+                'name' => 'Weibo'
+            ),
+            'windowslive' => array(
+                'name' => 'Windows Live'
+            ),
+            'wordpress' => array(
+                'name' => 'WordPress.com'
+            ),
+            'xing' => array(
+                'name' => 'Xing'
+            ),
+            'yahoo' => array(
+                'name' => 'Yahoo'
+            ),
+            'youtube' => array(
+                'name' => 'YouTube'
+            )
+        );
+
+        return $providers;
+    }
 }

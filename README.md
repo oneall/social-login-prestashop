@@ -5,7 +5,7 @@
 * [Social Login for PrestaShop 1.7+](https://github.com/oneall/social-login-prestashop/tree/prestashop/1.7+)
 
 
-# Social Login 3.9.1 for PrestaShop 1.6+
+# Social Login 3.10.0 for PrestaShop 1.6+
 Social Login for PrestaShop allows your users to login and register with 35+ social networks. 
 It increases your PrestaShop user registration rate by simplifying the registration process for 
 new users and provides permission-based social data retrieved from the social network profiles.
@@ -16,29 +16,41 @@ http://docs.oneall.com/plugins/guide/social-login-prestashop/
 
 ## Supported Social Networks
 * Amazon
+* Battle.net
 * Blogger
+* Discord
 * Disqus
+* Draugiem
+* Dribbble
 * Facebook
 * Foursquare
 * Github.com
 * Google
 * Instagram
+* Line
 * LinkedIn
 * LiveJournal
 * Mail.ru
+* Meetup
 * Odnoklassniki
 * OpenID
-* Paypal
+* PayPal
+* Pinterest
+* PixelPin
 * Reddit
 * Skyrock.com
+* SoundCloud
 * StackExchange
-* Steam Community
+* Steam
+* Tumblr
 * Twitch.tv
 * Twitter
 * Vimeo
-* Vk.com
+* VKontakte
+* Weibo
 * Windows Live
 * WordPress.com
+* Xing
 * Yahoo
 * YouTube
 
