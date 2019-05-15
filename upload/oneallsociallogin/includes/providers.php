@@ -93,6 +93,9 @@ class oneall_social_login_providers
             'meetup' => array(
                 'name' => 'Meetup'
             ),
+            'mixer' => array(
+                'name' => 'Mixer'
+            ),
             'odnoklassniki' => array(
                 'name' => 'Odnoklassniki.ru'
             ),

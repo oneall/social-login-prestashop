@@ -36,7 +36,7 @@ class OneallSocialLogin extends Module
     {
         $this->name = 'oneallsociallogin';
         $this->tab = 'administration';
-        $this->version = '1.2.0';
+        $this->version = '1.3.0';
         $this->author = 'OneAll LLC';
         $this->need_instance = 1;
         $this->secure_key = Tools::encrypt($this->name);
