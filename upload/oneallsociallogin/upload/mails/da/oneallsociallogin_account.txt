@@ -1,0 +1,23 @@
+﻿Hej {firstname} {lastname},
+
+Tak fordi du oprettede en kundekonto hos {shop_name}.
+
+Du kan fremover logge ind ved at benytte dit sociale netværkskontociale netværkskonto:
+
+Konto:  {identity_provider}
+
+Alternativt kan du også benytte følgende login informationer:
+
+E-mail adresse: {email}
+Password: {passwd}
+
+Du er nu klar til at bestille varer i vores shop: {shop_url}
+
+Vigtige sikkerhedstips:
+
+1. Opbevar dine kontooplysninger et sikkert sted.
+2. Opgiv aldrig dine login oplysninger til nogen.
+3. Skift din adgangskode jævnligt.
+4. Hvis du har mistanke om, at nogen bruger din konto ulovligt, bedes du straks underrette os.
+
+{shop_url} powered by PrestaShop™

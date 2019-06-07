@@ -8,6 +8,10 @@ All notable changes to this project will be documented in this file. This projec
 New providers added : 
 - Mixer
 
+## [4.3.1] - 2018-09-11
+### Added
+- DA language
+
 ## [4.3.0] - 2017-11-07
 ### Added
 New providers added : 

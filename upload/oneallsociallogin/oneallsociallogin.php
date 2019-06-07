@@ -27,6 +27,7 @@ if (!defined('_PS_VERSION_'))
 {
     exit();
 }
+
 class OneallSocialLogin extends Module
 {
     /**
@@ -371,9 +372,10 @@ class OneallSocialLogin extends Module
 				<label>' . $this->l('User Data Completion?') . '</label>
 				<div class="margin-form" style="margin-bottom: 20px;">
 					<p>' . $this->l('To create an account PrestaShop requires a firstname, a lastname and an email address. Some social networks (i.e. Twitter) however do not provide this data.') . '</p><br />
-					<input type="radio" name="OASL_DATA_HANDLING" id="OASL_DATA_HANDLING_VERIFY" value="verify" ' . (!in_array($data_handling, array(
-            'auto, ask'
-        )) ? 'checked="checked"' : '') . ' /> ' . $this->l('Always ask users to verify their data when they sign up with a social network') . ' <strong>(' . $this->l('Default') . ')</strong>
+					<input type="radio" name="OASL_DATA_HANDLING" id="OASL_DATA_HANDLING_VERIFY" value="verify" ' . (!in_array($data_handling,
+                                                                                                                               array(
+                                                                                                                                   'auto, ask'
+                                                                                                                               )) ? 'checked="checked"' : '') . ' /> ' . $this->l('Always ask users to verify their data when they sign up with a social network') . ' <strong>(' . $this->l('Default') . ')</strong>
 					<p>' . $this->l('Tick this option to have the users always verify the data retrieved from their social network profiles.') . '</p><br />
 					<input type="radio" name="OASL_DATA_HANDLING" id="OASL_DATA_HANDLING_ASK" value="ask" ' . ($data_handling == 'ask' ? 'checked="checked"' : '') . ' /> ' . $this->l('Only ask for missing values') . ' (' . $this->l('Faster Registration') . ')
 					<p>' . $this->l('Tick this option to have the users verify their data manually only in case there are required fields that are not provided by the social network.') . '</p><br />
@@ -397,7 +399,8 @@ class OneallSocialLogin extends Module
 										<div class="margin-form">
 											<div class="oasl_provider_block">
 												<span class="oasl_provider oasl_provider_' . $key . '" data-for="' . $provider_key . '"></span>
-												<input type="checkbox" id="' . $provider_key . '" name="OASL_PROVIDERS[]" value="' . $key . '" ' . (in_array($key, $use_provider_keys) ? 'checked="checked"' : '') . ' />
+												<input type="checkbox" id="' . $provider_key . '" name="OASL_PROVIDERS[]" value="' . $key . '" ' . (in_array($key,
+                                                                                                                                                             $use_provider_keys) ? 'checked="checked"' : '') . ' />
 											</div>
 									</div>
 								</div>';
@@ -839,11 +842,19 @@ class OneallSocialLogin extends Module
             }
 
             // Add Our JavaScript/CSS
-            $this->context->controller->registerJavascript($this->name . '.js', $this->_path . 'views/js/' . $this->name . '.js', ['position' => 'bottom', 'priority' => 8000]);
-            $this->context->controller->registerStylesheet($this->name . '.css', $this->_path . 'views/css/' . $this->name . '.css', ['position' => 'bottom', 'priority' => 8000]);
+            $this->context->controller->registerJavascript($this->name . '.js',
+                                                           $this->_path . 'views/js/' . $this->name . '.js',
+                                                           ['position' => 'bottom', 'priority' => 8000]);
+            $this->context->controller->registerStylesheet($this->name . '.css',
+                                                           $this->_path . 'views/css/' . $this->name . '.css',
+                                                           ['position' => 'bottom', 'priority' => 8000]);
 
             // Read library
             $output .= $this->display(__FILE__, 'oneallsociallogin_widget.tpl');
+        }
+        else
+        {
+            Logger::addLog('OneAll Plugin is misconfigured. Please, fix the plugin administration panel.', 2);
         }
 
         return $output;
@@ -858,51 +869,98 @@ class OneallSocialLogin extends Module
         $this->context = Context::getContext();
 
         // Only of the user is not logged in.
-        if (!$this->context->customer->isLogged())
+        if ($this->context->customer->isLogged())
         {
-            // Check for callback arguments.
-            if (Tools::getIsset('oa_action') === true && Tools::getIsset('connection_token') === true)
+            return null;
+        }
+
+        // Check for callback arguments.
+        if (Tools::getIsset('oa_action') !== true || Tools::getIsset('connection_token') !== true)
+        {
+            return null;
+        }
+
+        // Extract the callback arguments.
+        $oa_action = trim(Tools::getValue('oa_action'));
+        $connection_token = trim(Tools::getValue('connection_token'));
+
+        // Verify arguments
+        if ($oa_action != 'social_login')
+        {
+            Logger::addLog('OneAll no "social_login" action detected. Skipped.', 1);
+
+            return null;
+        }
+
+        if (strlen($connection_token) == 0)
+        {
+            Logger::addLog('Oneall : connection token is empty ! ', 2);
+
+            return null;
+        }
+
+        // Read the API credentials.
+        $api_key = Configuration::get('OASL_API_KEY');
+        $api_password = Configuration::get('OASL_API_PASSWORD');
+        $api_subdomain = Configuration::get('OASL_API_SUBDOMAIN');
+
+        // Read the API settings.
+        $api_handler = Configuration::get('OASL_API_HANDLER');
+        $api_handler = ($api_handler == 'fsockopen' ? 'fsockopen' : 'curl');
+        $api_port = Configuration::get('OASL_API_PORT');
+        $api_port = ($api_port == 80 ? 80 : 443);
+
+        // Set API resource uri.
+        $api_resource = (($api_port === 443) ? 'https' : 'http') . '://' . $api_subdomain . '.api.oneall.com/connections/' . $connection_token . '.json';
+
+        // Setup API parameters.
+        $api_params = array();
+        $api_params['api_key'] = $api_key;
+        $api_params['api_secret'] = $api_password;
+
+        // Retrieve connection details.
+        $result = oneall_social_login_tools::do_api_request($api_handler, $api_resource, $api_params, 15);
+
+        // Parse data.
+        $data = oneall_social_login_tools::extract_social_network_profile($result);
+
+        // Handle data.
+        if (!is_array($data))
+        {
+            Logger::addLog('OneAll: Unable to extract data from ' . $api_resource . ' :: ' . json_encode($result), 2);
+
+            return null;
+        }
+
+        // Get the customer identifier for a given token.
+        $id_customer_tmp = oneall_social_login_tools::get_id_customer_for_user_token($data['user_token']);
+
+        // This customer already exists.
+        if (is_numeric($id_customer_tmp))
+        {
+            // Update the identity.
+            oneall_social_login_tools::update_identity_logins($data['identity_token']);
+
+            // Login this customer.
+            $id_customer = $id_customer_tmp;
+        }
+        // This is a new customer.
+        else
+        {
+            // Account linking is enabled.
+            if (Configuration::get('OASL_LINK_ACCOUNT_DISABLE') != 1)
             {
-                // Extract the callback arguments.
-                $oa_action = trim(Tools::getValue('oa_action'));
-                $connection_token = trim(Tools::getValue('connection_token'));
-
-                // Verify arguments
-                if ($oa_action == 'social_login' and strlen($connection_token) > 0)
+                // Account linking only works if the email address has been verified.
+                if (!empty($data['user_email']) && $data['user_email_is_verified'] === true)
                 {
-                    // Read the API credentials.
-                    $api_key = Configuration::get('OASL_API_KEY');
-                    $api_password = Configuration::get('OASL_API_PASSWORD');
-                    $api_subdomain = Configuration::get('OASL_API_SUBDOMAIN');
-
-                    // Read the API settings.
-                    $api_handler = Configuration::get('OASL_API_HANDLER');
-                    $api_handler = ($api_handler == 'fsockopen' ? 'fsockopen' : 'curl');
-                    $api_port = Configuration::get('OASL_API_PORT');
-                    $api_port = ($api_port == 80 ? 80 : 443);
-
-                    // Set API resource uri.
-                    $api_resource = (($api_port === 443) ? 'https' : 'http') . '://' . $api_subdomain . '.api.oneall.com/connections/' . $connection_token . '.json';
-
-                    // Setup API parameters.
-                    $api_params = array();
-                    $api_params['api_key'] = $api_key;
-                    $api_params['api_secret'] = $api_password;
-
-                    // Retrieve connection details.
-                    $result = oneall_social_login_tools::do_api_request($api_handler, $api_resource, $api_params, 15);
-
-                    // Parse data.
-                    $data = oneall_social_login_tools::extract_social_network_profile($result);
-
-                    // Handle data.
-                    if (is_array($data))
+                    // Try to read the existing customer account.
+                    if (($id_customer_tmp = oneall_social_login_tools::get_id_customer_for_email_address($data['user_email'])) !== false)
                     {
-                        // Get the customer identifier for a given token.
-                        $id_customer_tmp = oneall_social_login_tools::get_id_customer_for_user_token($data['user_token']);
-
-                        // This customer already exists.
-                        if (is_numeric($id_customer_tmp))
+                        // Tie the user_token to the customer.
+                        if (oneall_social_login_tools::link_tokens_to_id_customer($id_customer_tmp,
+                                                                                  $data['user_token'],
+                                                                                  $data['identity_token'],
+                                                                                  $data['identity_provider']) === true)
                         {
                             // Update the identity.
                             oneall_social_login_tools::update_identity_logins($data['identity_token']);
@@ -910,143 +968,121 @@ class OneallSocialLogin extends Module
                             // Login this customer.
                             $id_customer = $id_customer_tmp;
                         }
-                        // This is a new customer.
-                        else
-                        {
-                            // Account linking is enabled.
-                            if (Configuration::get('OASL_LINK_ACCOUNT_DISABLE') != 1)
-                            {
-                                // Account linking only works if the email address has been verified.
-                                if (!empty($data['user_email']) && $data['user_email_is_verified'] === true)
-                                {
-                                    // Try to read the existing customer account.
-                                    if (($id_customer_tmp = oneall_social_login_tools::get_id_customer_for_email_address($data['user_email'])) !== false)
-                                    {
-                                        // Tie the user_token to the customer.
-                                        if (oneall_social_login_tools::link_tokens_to_id_customer($id_customer_tmp, $data['user_token'], $data['identity_token'], $data['identity_provider']) === true)
-                                        {
-                                            // Update the identity.
-                                            oneall_social_login_tools::update_identity_logins($data['identity_token']);
-
-                                            // Login this customer.
-                                            $id_customer = $id_customer_tmp;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        // Create a new user account.
-                        if (empty($id_customer))
-                        {
-                            // Notify the customer ?
-                            $customer_email_notify = true;
-
-                            // How do we have to proceed?
-                            switch (Configuration::get('OASL_DATA_HANDLING'))
-                            {
-                                // Automatic Completion.
-                                case 'auto':
-                                    // Generate a random email if none is provided or if it's already taken.
-                                    if (empty($data['user_email']) or oneall_social_login_tools::get_id_customer_for_email_address($data['user_email']) !== false)
-                                    {
-                                        // Generate a random email.
-                                        $data['user_email'] = oneall_social_login_tools::generate_random_email_address();
-
-                                        // But do not send notifications to this email
-                                        $customer_email_notify = false;
-                                    }
-
-                                    // Generate a lastname if none is provided.
-                                    if (empty($data['user_last_name']))
-                                    {
-                                        $data['user_last_name'] = 'Doe';
-                                    }
-
-                                    // Generate a firstname if none is provided.
-                                    if (empty($data['user_first_name']))
-                                    {
-                                        $data['user_first_name'] = 'John';
-                                    }
-                                    break;
-
-                                // Ask for manual completion if any of the fields is empty or if the email is already taken.
-                                case 'ask':
-                                    if (empty($data['user_email']) || empty($data['user_first_name']) || empty($data['user_last_name']) || oneall_social_login_tools::get_id_customer_for_email_address($data['user_email']) !== false)
-                                    {
-                                        // To which URL shall the user return to?
-                                        $return_to = trim(Tools::getValue('return_to'));
-                                        if (empty($return_to))
-                                        {
-                                            $return_to = oneall_social_login_tools::get_current_url();
-                                        }
-
-                                        // Add to cookie data
-                                        $data['return_to'] = $return_to;
-
-                                        // Save the data in the session.
-                                        $this->context->cookie->oasl_data = base64_encode(serialize($data));
-                                        $this->context->cookie->write();
-
-                                        // Redirect to the Social Login registration form
-                                        header('Location: ' . $this->context->link->getModuleLink($this->name, 'register'));
-                                        exit();
-                                    }
-                                    break;
-
-                                // Always verify the fields
-                                default:
-
-                                    // To which URL shall the user return to?
-                                    $return_to = trim(Tools::getValue('return_to'));
-                                    if (empty($return_to))
-                                    {
-                                        $return_to = oneall_social_login_tools::get_current_url();
-                                    }
-
-                                    // Add to cookie data
-                                    $data['return_to'] = $return_to;
-
-                                    // Save the data in the session.
-                                    $this->context->cookie->oasl_data = base64_encode(serialize($data));
-                                    $this->context->cookie->write();
-
-                                    // Redirect to the Social Login registration form
-                                    header('Location: ' . $this->context->link->getModuleLink($this->name, 'register'));
-                                    exit();
-                                    break;
-                            }
-
-                            // Email flags.
-                            $send_email_to_admin = ((Configuration::get('OASL_EMAIL_ADMIN_DISABLE') != 1) ? true : false);
-                            $send_email_to_customer = ($customer_email_notify == true and Configuration::get('OASL_EMAIL_CUSTOMER_DISABLE') != 1);
-
-                            // Create a new account.
-                            $id_customer = oneall_social_login_tools::create_customer_from_data($data, $send_email_to_admin, $send_email_to_customer);
-                        }
-
-                        // Login.
-                        if (!empty($id_customer) && oneall_social_login_tools::login_customer($id_customer))
-                        {
-                            // To which URL shall the user return to?
-                            $return_to = trim(Tools::getValue('return_to'));
-                            if (empty($return_to))
-                            {
-                                $return_to = oneall_social_login_tools::get_current_url();
-                            }
-
-                            // Remove Social Login Cookie
-                            if (isset($this->context->cookie->oasl_data))
-                            {
-                                unset($this->context->cookie->oasl_data);
-                            }
-
-                            // Redirect
-                            Tools::redirect($return_to);
-                        }
                     }
                 }
             }
         }
+
+        // Create a new user account.
+        if (empty($id_customer))
+        {
+            // Notify the customer ?
+            $customer_email_notify = true;
+
+            // How do we have to proceed?
+            switch (Configuration::get('OASL_DATA_HANDLING'))
+            {
+                // Automatic Completion.
+                case 'auto':
+                    // Generate a random email if none is provided or if it's already taken.
+                    if (empty($data['user_email']) or oneall_social_login_tools::get_id_customer_for_email_address($data['user_email']) !== false)
+                    {
+                        // Generate a random email.
+                        $data['user_email'] = oneall_social_login_tools::generate_random_email_address();
+
+                        // But do not send notifications to this email
+                        $customer_email_notify = false;
+                    }
+
+                    // Generate a lastname if none is provided.
+                    if (empty($data['user_last_name']))
+                    {
+                        $data['user_last_name'] = 'Doe';
+                    }
+
+                    // Generate a firstname if none is provided.
+                    if (empty($data['user_first_name']))
+                    {
+                        $data['user_first_name'] = 'John';
+                    }
+                    break;
+
+                // Ask for manual completion if any of the fields is empty or if the email is already taken.
+                case 'ask':
+                    if (empty($data['user_email']) || empty($data['user_first_name']) || empty($data['user_last_name']) || oneall_social_login_tools::get_id_customer_for_email_address($data['user_email']) !== false)
+                    {
+                        // To which URL shall the user return to?
+                        $return_to = trim(Tools::getValue('return_to'));
+                        if (empty($return_to))
+                        {
+                            $return_to = oneall_social_login_tools::get_current_url();
+                        }
+
+                        // Add to cookie data
+                        $data['return_to'] = $return_to;
+
+                        // Save the data in the session.
+                        $this->context->cookie->oasl_data = base64_encode(serialize($data));
+                        $this->context->cookie->write();
+
+                        // Redirect to the Social Login registration form
+                        header('Location: ' . $this->context->link->getModuleLink($this->name, 'register'));
+                        exit();
+                    }
+                    break;
+
+                // Always verify the fields
+                default:
+
+                    // To which URL shall the user return to?
+                    $return_to = trim(Tools::getValue('return_to'));
+                    if (empty($return_to))
+                    {
+                        $return_to = oneall_social_login_tools::get_current_url();
+                    }
+
+                    // Add to cookie data
+                    $data['return_to'] = $return_to;
+
+                    // Save the data in the session.
+                    $this->context->cookie->oasl_data = base64_encode(serialize($data));
+                    $this->context->cookie->write();
+
+                    // Redirect to the Social Login registration form
+                    header('Location: ' . $this->context->link->getModuleLink($this->name, 'register'));
+                    exit();
+                    break;
+            }
+
+            // Email flags.
+            $send_email_to_admin = ((Configuration::get('OASL_EMAIL_ADMIN_DISABLE') != 1) ? true : false);
+            $send_email_to_customer = ($customer_email_notify == true and Configuration::get('OASL_EMAIL_CUSTOMER_DISABLE') != 1);
+
+            // Create a new account.
+            $id_customer = oneall_social_login_tools::create_customer_from_data($data, $send_email_to_admin,
+                                                                                $send_email_to_customer);
+        }
+
+        // Login.
+        if (!empty($id_customer) && oneall_social_login_tools::login_customer($id_customer))
+        {
+            // To which URL shall the user return to?
+            $return_to = trim(Tools::getValue('return_to'));
+            if (empty($return_to))
+            {
+                $return_to = oneall_social_login_tools::get_current_url();
+            }
+
+            // Remove Social Login Cookie
+            if (isset($this->context->cookie->oasl_data))
+            {
+                unset($this->context->cookie->oasl_data);
+            }
+
+            // Redirect
+            Tools::redirect($return_to);
+        }
+
+        Logger::addLog('OneAll: Login failed for ' . json_encode($data), 1);
     }
 }
