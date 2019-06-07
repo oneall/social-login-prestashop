@@ -1,11 +1,11 @@
 ## Available Versions
-* [Social Login for PrestaShop 1.4+](https://github.com/oneall/social-login-prestashop/tree/prestashop/1.4+)
-* **Social Login for PrestaShop 1.5+**
-* [Social Login for PrestaShop 1.6+](https://github.com/oneall/social-login-prestashop/tree/prestashop/1.6+)
+* [Social Login for PrestaShop 1.4.x](https://github.com/oneall/social-login-prestashop/tree/prestashop/1.4.x)
+* **Social Login for PrestaShop 1.5.x**
+* [Social Login for PrestaShop 1.6.x](https://github.com/oneall/social-login-prestashop/tree/prestashop/1.6.x)
 * [Social Login for PrestaShop 1.7+](https://github.com/oneall/social-login-prestashop/tree/prestashop/1.7+)
 
-# Social Login 2.4.0 for PrestaShop 1.5+
-Social Login for PrestaShop allows your users to login and register with 35+ social networks. 
+# Social Login 2.4.0 for PrestaShop 1.5.x
+Social Login for PrestaShop allows your users to login and register with 40+ social networks. 
 It increases your PrestaShop user registration rate by simplifying the registration process for 
 new users and provides permission-based social data retrieved from the social network profiles.
 
