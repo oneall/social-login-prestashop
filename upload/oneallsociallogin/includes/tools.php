@@ -26,7 +26,7 @@
 //OneAll Social Login Toolbox
 class oneall_social_login_tools
 {
-    const USER_AGENT = 'SocialLogin/4.3.0 PrestaShop/1.7.x.x (+http://www.oneall.com/)';
+    const USER_AGENT = 'SocialLogin/4.4.0 PrestaShop/1.7.x.x (+http://www.oneall.com/)';
 
     /**
      * Logs a given customer in.
