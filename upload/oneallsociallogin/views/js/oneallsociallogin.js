@@ -61,24 +61,25 @@ function oneallsociallogin(_oneall, providers, auth_disable, custom_title, custo
 }
 
 
-/* OneAll Social Login Library */
-if (oasl_widget_location == 'library'){
+$(document).ready(function() {
 
-	/* OneAll Social Login */
-	/* http://docs.oneall.com/plugins/guide/social-login-prestashop/ */
+	/* OneAll Social Login Library */
+	if (oasl_widget_location == 'library'){
 
-	/* Asynchronous Library */      
-	var oa = document.createElement('script');
-	oa.type = 'text/javascript'; oa.async = true;
-	oa.src = '//'+oasl_subdomain+'.api.oneall.com/socialize/library.js';
-	var s = document.getElementsByTagName('script')[0];
-	s.parentNode.insertBefore(oa, s);
+		/* OneAll Social Login */
+		/* http://docs.oneall.com/plugins/guide/social-login-prestashop/ */
+
+		/* Asynchronous Library */      
+		var oa = document.createElement('script');
+		oa.type = 'text/javascript'; oa.async = true;
+		oa.src = '//'+oasl_subdomain+'.api.oneall.com/socialize/library.js';
+		var s = document.getElementsByTagName('script')[0];
+		s.parentNode.insertBefore(oa, s);
 
 
-	if ($('#oneall_social_login').length > 0){
-		/* Custom Hooks */      
-		var _oneall = _oneall || [];                
-		$(document).ready(function() {
+		if ($('#oneall_social_login').length > 0){
+			/* Custom Hooks */      
+			var _oneall = _oneall || [];            
 			if (typeof oneallsociallogin !== 'undefined') {
 				if (oasl_translated_title != ' '){
 					oneallsociallogin (_oneall, providers, oasl_auth_disable, oasl_translated_title);
@@ -88,6 +89,7 @@ if (oasl_widget_location == 'library'){
 			} else {
 				throw new Error("OneAll Social Login is not correctly installed, the required file oneallsocialogin.js is not included.");
 			}
-		});  
+		}
 	}
-}
+
+});  
