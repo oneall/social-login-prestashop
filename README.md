@@ -5,7 +5,7 @@
 * [Social Login for PrestaShop 1.7+](https://github.com/oneall/social-login-prestashop/tree/prestashop/1.7+)
 
 
-# Social Login 3.11.0 for PrestaShop 1.6.x
+# Social Login 3.12.0 for PrestaShop 1.6.x
 Social Login for PrestaShop allows your users to login and register with 40+ social networks. 
 It increases your PrestaShop user registration rate by simplifying the registration process for 
 new users and provides permission-based social data retrieved from the social network profiles.
@@ -35,6 +35,7 @@ http://docs.oneall.com/plugins/guide/social-login-prestashop/
 * Mixer
 * Odnoklassniki
 * OpenID
+* Patreon
 * PayPal
 * Pinterest
 * PixelPin
