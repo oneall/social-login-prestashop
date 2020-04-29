@@ -102,6 +102,9 @@ class oneall_social_login_providers
             'openid' => array(
                 'name' => 'OpenID'
             ),
+            'patreon' => array(
+                'name' => 'Patreon'
+            ),
             'paypal' => array(
                 'name' => 'PayPal'
             ),
