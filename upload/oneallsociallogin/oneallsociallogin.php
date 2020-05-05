@@ -35,7 +35,7 @@ class OneallSocialLogin extends Module
     {
         $this->name = 'oneallsociallogin';
         $this->tab = 'administration';
-        $this->version = '3.12.0';
+        $this->version = '3.13.0';
         $this->author = 'OneAll LLC';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = array(
@@ -941,7 +941,7 @@ class OneallSocialLogin extends Module
                                     if (empty($data['user_email']) or empty($data['user_first_name']) or empty($data['user_last_name']) or oneall_social_login_tools::get_id_customer_for_email_address($data['user_email']) !== false)
                                     {
                                         // Save the data in the session.
-                                        $this->context->cookie->oasl_data = base64_encode(serialize($data));
+                                        $this->context->cookie->oasl_data = json_encode($data);
 
                                         // Redirect to the request form
                                         header('Location: ' . $redirect_to);
@@ -952,7 +952,7 @@ class OneallSocialLogin extends Module
                                 // Always verify the fields
                                 default:
                                     // Save the data in the session.
-                                    $this->context->cookie->oasl_data = base64_encode(serialize($data));
+                                    $this->context->cookie->oasl_data = json_encode($data);
 
                                     // Redirect to the request form
                                     header('Location: ' . $redirect_to);
