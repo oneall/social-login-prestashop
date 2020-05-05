@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
 
-## [3.13.0] - 2020-05-05
+## [3.12.1] - 2020-05-05
 ### Fixed
 Problem with cookies and base64
 
