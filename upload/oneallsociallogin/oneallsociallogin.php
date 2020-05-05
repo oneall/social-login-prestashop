@@ -373,9 +373,9 @@ class OneallSocialLogin extends Module
 				<div class="margin-form" style="margin-bottom: 20px;">
 					<p>' . $this->l('To create an account PrestaShop requires a firstname, a lastname and an email address. Some social networks (i.e. Twitter) however do not provide this data.') . '</p><br />
 					<input type="radio" name="OASL_DATA_HANDLING" id="OASL_DATA_HANDLING_VERIFY" value="verify" ' . (!in_array($data_handling,
-                                                                                                                               array(
-                                                                                                                                   'auto, ask'
-                                                                                                                               )) ? 'checked="checked"' : '') . ' /> ' . $this->l('Always ask users to verify their data when they sign up with a social network') . ' <strong>(' . $this->l('Default') . ')</strong>
+            array(
+                'auto, ask'
+            )) ? 'checked="checked"' : '') . ' /> ' . $this->l('Always ask users to verify their data when they sign up with a social network') . ' <strong>(' . $this->l('Default') . ')</strong>
 					<p>' . $this->l('Tick this option to have the users always verify the data retrieved from their social network profiles.') . '</p><br />
 					<input type="radio" name="OASL_DATA_HANDLING" id="OASL_DATA_HANDLING_ASK" value="ask" ' . ($data_handling == 'ask' ? 'checked="checked"' : '') . ' /> ' . $this->l('Only ask for missing values') . ' (' . $this->l('Faster Registration') . ')
 					<p>' . $this->l('Tick this option to have the users verify their data manually only in case there are required fields that are not provided by the social network.') . '</p><br />
@@ -400,7 +400,7 @@ class OneallSocialLogin extends Module
 											<div class="oasl_provider_block">
 												<span class="oasl_provider oasl_provider_' . $key . '" data-for="' . $provider_key . '"></span>
 												<input type="checkbox" id="' . $provider_key . '" name="OASL_PROVIDERS[]" value="' . $key . '" ' . (in_array($key,
-                                                                                                                                                             $use_provider_keys) ? 'checked="checked"' : '') . ' />
+                $use_provider_keys) ? 'checked="checked"' : '') . ' />
 											</div>
 									</div>
 								</div>';
@@ -843,11 +843,11 @@ class OneallSocialLogin extends Module
 
             // Add Our JavaScript/CSS
             $this->context->controller->registerJavascript($this->name . '.js',
-                                                           $this->_path . 'views/js/' . $this->name . '.js',
-                                                           ['position' => 'bottom', 'priority' => 8000]);
+                $this->_path . 'views/js/' . $this->name . '.js',
+                ['position' => 'bottom', 'priority' => 8000]);
             $this->context->controller->registerStylesheet($this->name . '.css',
-                                                           $this->_path . 'views/css/' . $this->name . '.css',
-                                                           ['position' => 'bottom', 'priority' => 8000]);
+                $this->_path . 'views/css/' . $this->name . '.css',
+                ['position' => 'bottom', 'priority' => 8000]);
 
             // Read library
             $output .= $this->display(__FILE__, 'oneallsociallogin_widget.tpl');
@@ -958,9 +958,9 @@ class OneallSocialLogin extends Module
                     {
                         // Tie the user_token to the customer.
                         if (oneall_social_login_tools::link_tokens_to_id_customer($id_customer_tmp,
-                                                                                  $data['user_token'],
-                                                                                  $data['identity_token'],
-                                                                                  $data['identity_provider']) === true)
+                            $data['user_token'],
+                            $data['identity_token'],
+                            $data['identity_provider']) === true)
                         {
                             // Update the identity.
                             oneall_social_login_tools::update_identity_logins($data['identity_token']);
@@ -1022,7 +1022,7 @@ class OneallSocialLogin extends Module
                         $data['return_to'] = $return_to;
 
                         // Save the data in the session.
-                        $this->context->cookie->oasl_data = base64_encode(serialize($data));
+                        $this->context->cookie->oasl_data = json_encode($data);
                         $this->context->cookie->write();
 
                         // Redirect to the Social Login registration form
@@ -1045,7 +1045,7 @@ class OneallSocialLogin extends Module
                     $data['return_to'] = $return_to;
 
                     // Save the data in the session.
-                    $this->context->cookie->oasl_data = base64_encode(serialize($data));
+                    $this->context->cookie->oasl_data = json_encode($data);
                     $this->context->cookie->write();
 
                     // Redirect to the Social Login registration form
@@ -1060,7 +1060,7 @@ class OneallSocialLogin extends Module
 
             // Create a new account.
             $id_customer = oneall_social_login_tools::create_customer_from_data($data, $send_email_to_admin,
-                                                                                $send_email_to_customer);
+                $send_email_to_customer);
         }
 
         // Login.
