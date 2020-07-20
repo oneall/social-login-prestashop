@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [4.5.2] - 2020-07-20
+### Added
+Fixed login problem on Prestashop 1.7.6.7
+
 ## [4.5.1] - 2020-05-05
 ### Added
 Fixed problem with cookie and base 64

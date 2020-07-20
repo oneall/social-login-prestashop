@@ -26,7 +26,7 @@
 //OneAll Social Login Toolbox
 class oneall_social_login_tools
 {
-    const USER_AGENT = 'SocialLogin/4.5.1 PrestaShop/1.7.x.x (+http://www.oneall.com/)';
+    const USER_AGENT = 'SocialLogin/4.5.2 PrestaShop/1.7.x.x (+http://www.oneall.com/)';
 
     /**
      * Logs a given customer in.
@@ -68,6 +68,9 @@ class oneall_social_login_tools
 
             // Add customer to the context
             $context->customer = $customer;
+
+            // Used to init session
+            $context->updateCustomer($customer);
 
             if (Configuration::get('PS_CART_FOLLOWING') && (empty($context->cookie->id_cart) || Cart::getNbProducts($context->cookie->id_cart) == 0) && $id_cart = (int) Cart::lastNoneOrderedCart($context->customer->id))
             {
