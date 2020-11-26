@@ -45,6 +45,9 @@ class oneall_social_login_providers
             'amazon' => array(
                 'name' => 'Amazon'
             ),
+            'apple' => array(
+                'name' => 'Apple'
+            ),
             'battlenet' => array(
                 'name' => 'Battle.net'
             ),
