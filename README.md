@@ -23,6 +23,7 @@ http://docs.oneall.com/plugins/guide/social-login-prestashop/
 * Disqus
 * Draugiem
 * Dribbble
+* Epic Games
 * Facebook
 * Foursquare
 * Github.com
@@ -43,8 +44,10 @@ http://docs.oneall.com/plugins/guide/social-login-prestashop/
 * Reddit
 * Skyrock.com
 * SoundCloud
+* Spotify
 * StackExchange
 * Steam
+* Strava
 * Tumblr
 * Twitch.tv
 * Twitter
@@ -55,6 +58,7 @@ http://docs.oneall.com/plugins/guide/social-login-prestashop/
 * WordPress.com
 * Xing
 * Yahoo
+* Yandex
 * YouTube
 
 ## About Us

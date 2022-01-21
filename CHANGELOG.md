@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.14.0] - 2022-01-21
+### Added
+New providers added : 
+- Epic Games
+- Spotify
+- Strava
+- Yandex
 
 ## [3.13.0] - 2020-11-26
 ### Added
