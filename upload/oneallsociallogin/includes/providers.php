@@ -66,6 +66,9 @@ class oneall_social_login_providers
             'dribbble' => array(
                 'name' => 'Dribbble'
             ),
+            'epicgames' => array(
+                'name' => 'Epic Games'
+            ),
             'facebook' => array(
                 'name' => 'Facebook'
             ),
@@ -126,11 +129,17 @@ class oneall_social_login_providers
             'soundcloud' => array(
                 'name' => 'SoundCloud'
             ),
+            'spotify' => array(
+                'name' => 'Spotify'
+            ),
             'stackexchange' => array(
                 'name' => 'StackExchange'
             ),
             'steam' => array(
                 'name' => 'Steam'
+            ),
+            'strava' => array(
+                'name' => 'Strava'
             ),
             'tumblr' => array(
                 'name' => 'Tumblr'
@@ -161,6 +170,9 @@ class oneall_social_login_providers
             ),
             'yahoo' => array(
                 'name' => 'Yahoo'
+            ),
+            'yandex' => array(
+                'name' => 'Yandex'
             ),
             'youtube' => array(
                 'name' => 'YouTube'
