@@ -174,6 +174,7 @@ class OneallSocialLogin extends Module
             Configuration::updateValue('OASL_JS_HOOK_AUTH_DISABLE', $js_hook_auth_disable);
             Configuration::updateValue('OASL_HOOK_LEFT_DISABLE', $hook_left_disable);
             Configuration::updateValue('OASL_HOOK_RIGHT_DISABLE', $hook_right_disable);
+            Configuration::updateValue('OASL_FORCE_TITLE_CUSTOM_BLOCK', $use_title_custom_hook);
             Configuration::updateValue('OASL_LINK_ACCOUNT_DISABLE', $link_account_disable);
             Configuration::updateValue('OASL_DATA_HANDLING', $data_handling);
             Configuration::updateValue('OASL_EMAIL_ADMIN_DISABLE', $email_admin_disable);
@@ -199,6 +200,9 @@ class OneallSocialLogin extends Module
 
         // JavaScript Hook for Authentication
         $js_hook_auth_disable = Configuration::get('OASL_JS_HOOK_AUTH_DISABLE') == 1 ? 1 : 0;
+
+        // JavaScript Hook for Authentication
+        $use_title_custom_hook = Configuration::get('OASL_FORCE_TITLE_CUSTOM_BLOCK') == 1 ? 1 : 0;
 
         // Settings
         $link_account_disable = Configuration::get('OASL_LINK_ACCOUNT_DISABLE') == 1 ? 1 : 0;
@@ -727,13 +731,6 @@ class OneallSocialLogin extends Module
                     $smarty->assign('oasl_use_title_custom_hook', (Configuration::get('OASL_FORCE_TITLE_CUSTOM_BLOCK') == 1 ? 'true' : ''));
 
                     break;
-
-                    // default:
-                    //     $widget_enable = true;
-                    //     $widget_location = $target;
-                    //     $smarty->assign('oasl_use_title_custom_hook', (Configuration::get('OASL_FORCE_TITLE_CUSTOM_BLOCK') == 1 ? 'true' : ''));
-
-                    //     break;
             }
 
             // Enable this widget?
