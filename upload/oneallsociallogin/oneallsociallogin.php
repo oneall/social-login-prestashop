@@ -825,6 +825,12 @@ class OneallSocialLogin extends Module
             // Add a shortcut.
             $smarty->assign('HOOK_OASL_CUSTOM', $this->hookGeneric($params, 'custom'));
 
+            // For multiple plugin in the same page
+            for ($i = 1; $i < 11; $i++)
+            {
+                $smarty->assign('HOOK_OASL_CUSTOM_' . $i, $this->hookGeneric($params, 'custom'));
+            }
+
             // Add the OneAll Social Library.
             $smarty->assign('oasl_widget_location', 'library');
 
