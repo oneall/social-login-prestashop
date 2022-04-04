@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.15.0] - 2022-04-04
+### Added
+Possibility to add several custom hooks in the same page
+
 ## [3.14.0] - 2022-01-21
 ### Added
 New providers added : 

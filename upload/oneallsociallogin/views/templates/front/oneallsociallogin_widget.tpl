@@ -112,7 +112,17 @@
 	</div>
 {/if}
 
-{if {$oasl_widget_location} eq 'custom'}
+{if {$oasl_widget_location} eq 'custom'}		
+
+	{if {$oasl_use_title_custom_hook} eq 'true'}
+		
+		<div class="block oneall_social_login_block" id="oneall_social_login_custom_container">
+			{if {$oasl_translated_title|strip} neq ' '}
+				<p class="title_block">{$oasl_translated_title}</p>
+			{/if}
+		</div>
+	{/if}
+	
 	<div class="oneall_social_login_providers oneall_social_login_providers_custom" id="oneall_social_login_providers_{$oasl_widget_rnd}"></div>
 	<script type="text/javascript">
 		var _oneall = _oneall || [];

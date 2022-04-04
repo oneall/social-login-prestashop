@@ -35,7 +35,7 @@ class OneallSocialLogin extends Module
     {
         $this->name = 'oneallsociallogin';
         $this->tab = 'administration';
-        $this->version = '3.14.0';
+        $this->version = '3.15.0';
         $this->author = 'OneAll LLC';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = array(
@@ -61,6 +61,7 @@ class OneallSocialLogin extends Module
             Configuration::updateValue('OASL_PROVIDERS', 'facebook,twitter,google,linkedin');
             Configuration::updateValue('OASL_LINK_ACCOUNT_DISABLE', 0);
             Configuration::updateValue('OASL_JS_HOOK_AUTH_DISABLE', 0);
+            Configuration::updateValue('OASL_FORCE_TITLE_CUSTOM_BLOCK', 0);
             Configuration::updateValue('OASL_HOOK_LEFT_DISABLE', 0);
             Configuration::updateValue('OASL_HOOK_RIGHT_DISABLE', 0);
             Configuration::updateValue('OASL_DATA_HANDLING', 'verify');
@@ -143,6 +144,9 @@ class OneallSocialLogin extends Module
 
             // Hook Right
             $hook_right_disable = (Tools::getValue('OASL_HOOK_RIGHT_DISABLE') == 1 ? 1 : 0);
+
+            // Hook custom
+            $use_title_custom_hook = (Tools::getValue('OASL_FORCE_TITLE_CUSTOM_BLOCK') == 1 ? 1 : 0);
 
             // JavaScript Hook for Authentication
             $js_hook_auth_disable = (Tools::getValue('OASL_JS_HOOK_AUTH_DISABLE') == 1 ? 1 : 0);
@@ -327,6 +331,16 @@ class OneallSocialLogin extends Module
 			</fieldset>
 
 			<fieldset style="margin-top:20px">
+                <legend>' . $this->l('Hook: Custom') . '</legend>
+                <div class="oasl_notice">' . $this->l('Displays Social Login title before icons when using {$HOOK_OASL_CUSTOM nofilter} hook') . '</div>
+                <label>' . $this->l('Enable title in Custom Hook?') . '</label>
+                <div class="margin-form" style="margin-bottom: 20px;">
+                    <input type="radio" name="OASL_FORCE_TITLE_CUSTOM_BLOCK" id="OASL_FORCE_TITLE_CUSTOM_BLOCK_1" value="1" ' . ($use_title_custom_hook == 1 ? 'checked="checked"' : '') . ' /> ' . $this->l('Enable') . '&nbsp;
+                    <input type="radio" name="OASL_FORCE_TITLE_CUSTOM_BLOCK" id="OASL_FORCE_TITLE_CUSTOM_BLOCK_0" value="0" ' . ($use_title_custom_hook != 1 ? 'checked="checked"' : '') . ' /> ' . $this->l('Disable') . '<br />
+                </div>
+            </fieldset>
+
+            <fieldset style="margin-top:20px">
 				<legend>' . $this->l('Settings') . '</legend>
 
 				<label>' . $this->l('Enable Administrator Emails?') . '</label>
@@ -710,7 +724,16 @@ class OneallSocialLogin extends Module
                 case 'custom':
                     $widget_enable = true;
                     $widget_location = $target;
+                    $smarty->assign('oasl_use_title_custom_hook', (Configuration::get('OASL_FORCE_TITLE_CUSTOM_BLOCK') == 1 ? 'true' : ''));
+
                     break;
+
+                    // default:
+                    //     $widget_enable = true;
+                    //     $widget_location = $target;
+                    //     $smarty->assign('oasl_use_title_custom_hook', (Configuration::get('OASL_FORCE_TITLE_CUSTOM_BLOCK') == 1 ? 'true' : ''));
+
+                    //     break;
             }
 
             // Enable this widget?
@@ -784,6 +807,12 @@ class OneallSocialLogin extends Module
 
             // Add a shortcut.
             $smarty->assign('HOOK_OASL_CUSTOM', $this->hookGeneric($params, 'custom'));
+
+            // For multiple plugin in the same page
+            for ($i = 1; $i < 11; $i++)
+            {
+                $smarty->assign('HOOK_OASL_CUSTOM_' . $i, $this->hookGeneric($params, 'custom'));
+            }
 
             // Add the OneAll Social Library.
             $smarty->assign('oasl_widget_location', 'library');
