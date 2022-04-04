@@ -37,7 +37,7 @@ class OneallSocialLogin extends Module
     {
         $this->name = 'oneallsociallogin';
         $this->tab = 'administration';
-        $this->version = '4.7.0';
+        $this->version = '4.7.1';
         $this->author = 'OneAll LLC';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = array(
@@ -773,14 +773,6 @@ class OneallSocialLogin extends Module
     {
         return $this->hookGeneric($params, 'customer_account_form');
     }
-
-    /**
-     * Hook: Customer Account Form
-     */
-    // public function hookDisplayCustomerAccountForm($params)
-    // {
-    //     return $this->hookGeneric($params, 'customer_account_form');
-    // }
 
     /**
      * Hook: Left Column
