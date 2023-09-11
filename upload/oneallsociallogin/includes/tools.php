@@ -93,6 +93,9 @@ class oneall_social_login_tools
 
             Hook::exec('actionAuthentication');
 
+            // Login fix for older version of PS (1.7.7.1 etc...)
+            $context->cookie->registerSession(new CustomerSession());
+
             // Login information have changed, so we check if the cart rules still apply
             CartRule::autoRemoveFromCart($context);
             CartRule::autoAddToCart($context);
