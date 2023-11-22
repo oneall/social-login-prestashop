@@ -26,7 +26,7 @@
 //OneAll Social Login Toolbox
 class oneall_social_login_tools
 {
-    const USER_AGENT = 'SocialLogin/4.7.1 PrestaShop/1.7.x.x (+http://www.oneall.com/)';
+    const USER_AGENT = 'SocialLogin/5.0.0 PrestaShop/8.x (+http://www.oneall.com/)';
 
     /**
      * Logs a given customer in.
@@ -45,10 +45,7 @@ class oneall_social_login_tools
             $customer->id = $result['id_customer'];
             foreach ($result as $key => $value)
             {
-                if (key_exists($key, $customer))
-                {
-                    $customer->{$key} = $value;
-                }
+                $customer->{$key} = $value;              
             }
 
             // See => AuthControllerCore::processSubmitLogin
@@ -549,10 +546,11 @@ class oneall_social_login_tools
                 if (property_exists($identity, 'emails') && is_array($identity->emails))
                 {
                     $data['user_email_is_verified'] = false;
-                    while ($data['user_email_is_verified'] !== true && (list(, $obj) = each($identity->emails)))
-                    {
-                        $data['user_email'] = $obj->value;
-                        $data['user_email_is_verified'] = !empty($obj->is_verified);
+                    foreach ($identity->emails as $obj) {
+                        if ($data['user_email_is_verified'] !== true ) {
+                          $data['user_email'] = $obj->value;
+                          $data['user_email_is_verified'] = !empty($obj->is_verified);
+                        }
                     }
                 }
 

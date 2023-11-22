@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [5.0.0] - 2023-11-22
+### Fix
+Compatibility with Prestashop 8.x+
+
 ## [4.7.0] - 2022-01-21
 ### Added
 Epic Games, Spotify, Strava and Yandex added as providers
