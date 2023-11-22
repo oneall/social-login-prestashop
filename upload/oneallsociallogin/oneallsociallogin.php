@@ -769,6 +769,14 @@ class OneallSocialLogin extends Module
     /**
      * Hook: Customer Account Form Top
      */
+    public function hookDisplayCustomerAccountForm($params)
+    {
+        return $this->hookGeneric($params, 'customer_account_form');
+    }
+
+    /**
+     * Hook: Customer Account Form Top
+     */
     public function hookDisplayCustomerAccountFormTop($params)
     {
         return $this->hookGeneric($params, 'customer_account_form');
