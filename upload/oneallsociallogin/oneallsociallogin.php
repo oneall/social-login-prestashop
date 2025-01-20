@@ -626,6 +626,15 @@ class OneallSocialLogin extends Module
 
             return false;
         }
+        
+        // Create tmp cart table.
+        $query = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'oasl_tmp_cart` ( `oasl_tmp_cart_id` int(10) unsigned NOT NULL AUTO_INCREMENT, `cart_id` int(10) unsigned NOT NULL DEFAULT "0", `cart_tmp_token` varchar(48) NOT NULL, `date_added` datetime NOT NULL, PRIMARY KEY (`oasl_tmp_cart_id`), KEY `cart_id` (`cart_id`), KEY `cart_tmp_token` (`cart_tmp_token`))';
+        if (!Db::getInstance()->execute($query))
+        {
+            $this->context->controller->errors[] = "Could not create the table " . _DB_PREFIX_ . "oasl_tmp_cart";
+            
+            return false;
+        }
 
         // Clean class cache.
         $class_cache = _PS_CACHE_DIR_ . 'class_index.php';
