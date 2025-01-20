@@ -37,7 +37,7 @@ class OneallSocialLogin extends Module
     {
         $this->name = 'oneallsociallogin';
         $this->tab = 'administration';
-        $this->version = '5.0.0';
+        $this->version = '5.1.0';
         $this->author = 'OneAll LLC';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = array(

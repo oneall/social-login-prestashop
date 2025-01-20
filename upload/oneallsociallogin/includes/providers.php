@@ -141,6 +141,9 @@ class oneall_social_login_providers
             'strava' => array(
                 'name' => 'Strava'
             ),
+            'tiktok' => array(
+                'name' => 'TikTok'
+            ),
             'tumblr' => array(
                 'name' => 'Tumblr'
             ),
@@ -148,7 +151,7 @@ class oneall_social_login_providers
                 'name' => 'Twitch.tv'
             ),
             'twitter' => array(
-                'name' => 'Twitter'
+                'name' => 'X'
             ),
             'vimeo' => array(
                 'name' => 'Vimeo'
