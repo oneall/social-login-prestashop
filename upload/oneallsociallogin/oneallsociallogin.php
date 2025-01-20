@@ -751,10 +751,26 @@ class OneallSocialLogin extends Module
                 $providers = explode(',', trim(Configuration::get('OASL_PROVIDERS')));
                 if (is_array($providers) and count($providers) > 0)
                 {
+                    
+                    // Save tmp cart
+                    if (empty($this->context->cookie->oasl_cart) && !empty($this->context->cart->id))
+                    {
+                        $token = substr(bin2hex(random_bytes(10)), 0, 20);
+                        $sql = "INSERT INTO `" . _DB_PREFIX_ . "oasl_tmp_cart` SET `cart_id` = '" . pSQL($this->context->cart->id) . "', `cart_tmp_token` = '" . pSQL($token) . "', `date_added`='" . date('Y-m-d H:i:s') . "'";
+                        $result = Db::getInstance()->execute($sql);
+                        $this->context->cookie->oasl_cart = $token;
+                        $smarty->assign('oasl_cart', $token);
+                        $smarty->assign('oasl_widget_callback_data', '&oasl_cart=' . $token);
+                    }
+                    else
+                    {
+                        $token = $this->context->cookie->oasl_cart;
+                    }
+                    
                     // Setup placeholders
                     $smarty->assign('oasl_widget_location', $widget_location);
                     $smarty->assign('oasl_widget_rnd', mt_rand(99999, 9999999));
-                    $smarty->assign('oasl_widget_callback', oneall_social_login_tools::get_callback_uri(true));
+                    $smarty->assign('oasl_widget_callback', oneall_social_login_tools::get_callback_uri(true) . '&oasl_cart=' . $token);
                     $smarty->assign('oasl_widget_css', '');
                     $smarty->assign('oasl_widget_providers', '"' . implode('","', $providers) . '"');
 
@@ -1084,7 +1100,13 @@ class OneallSocialLogin extends Module
             {
                 unset($this->context->cookie->oasl_data);
             }
-
+            
+            // Retrieve cart
+            if (!empty($_GET['oasl_cart'])){
+                $tmp_cart_id = oneall_social_login_tools::get_tmp_cart($_GET['oasl_cart']);
+                oneall_social_login_tools::convert_guest_cart($tmp_cart_id, $this->context->cart->id, $id_customer);
+            }
+            
             // Redirect
             Tools::redirect($return_to);
         }

@@ -546,8 +546,10 @@ class oneall_social_login_tools
                 if (property_exists($identity, 'emails') && is_array($identity->emails))
                 {
                     $data['user_email_is_verified'] = false;
-                    foreach ($identity->emails as $obj) {
-                        if ($data['user_email_is_verified'] !== true ) {
+                    foreach ($identity->emails as $obj)
+                    {
+                        if ($data['user_email_is_verified'] !== true)
+                        {
                           $data['user_email'] = $obj->value;
                           $data['user_email_is_verified'] = !empty($obj->is_verified);
                         }
@@ -906,5 +908,26 @@ class oneall_social_login_tools
         // HTTPS is off.
 
         return false;
+    }
+    
+    
+    public static function get_tmp_cart($token)
+    {
+        // Get guest cart
+        $sql = "SELECT cart_id FROM `" . _DB_PREFIX_ . "oasl_tmp_cart` WHERE `cart_tmp_token` = '" . pSQL($token) . "'";
+        $result = Db::getInstance()->getRow($sql);
+        return isset($result['cart_id']) ? $result['cart_id'] : null;
+    }
+    
+    
+    public static function convert_guest_cart($tmp_cart_id, $new_cart_id, $customer_id)
+    {
+        // Update products of guest cart to new cart
+        $sql = "UPDATE `" . _DB_PREFIX_ . "cart_product` SET `id_cart` = '" . pSQL($new_cart_id) . "' WHERE `id_cart` = '" . pSQL($tmp_cart_id) . "'";
+        $result = Db::getInstance()->execute($sql);
+        
+        // Delete guest cart
+        $sql = "DELETE FROM `" . _DB_PREFIX_ . "oasl_tmp_cart` WHERE `cart_id` = '" . pSQL($tmp_cart_id) . "'";
+        $result = Db::getInstance()->execute($sql);
     }
 }
