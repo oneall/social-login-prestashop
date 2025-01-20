@@ -151,7 +151,7 @@ class OneAllSocialLoginRegisterModuleFrontController extends ModuleFrontControll
         // We could not extract the data.
         if ($have_error)
         {
-            Tools::redirect(oneall_social_login_tools::get_current_url());
+            Tools::redirect('index');
         }
     }
 }
