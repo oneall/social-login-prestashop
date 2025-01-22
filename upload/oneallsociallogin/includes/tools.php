@@ -925,6 +925,9 @@ class oneall_social_login_tools
         // Update products of guest cart to new cart
         $sql = "UPDATE `" . _DB_PREFIX_ . "cart_product` SET `id_cart` = '" . pSQL($new_cart_id) . "' WHERE `id_cart` = '" . pSQL($tmp_cart_id) . "'";
         $result = Db::getInstance()->execute($sql);
+
+        $cart = new Cart($tmp_cart_id);
+        $cart->delete();
         
         // Delete guest cart
         $sql = "DELETE FROM `" . _DB_PREFIX_ . "oasl_tmp_cart` WHERE `cart_id` = '" . pSQL($tmp_cart_id) . "'";
